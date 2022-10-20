@@ -1,11 +1,38 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QDebug>
+#include <QString>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    // Establishing connection to databasee
+    db = QSqlDatabase::addDatabase("QMYSQL");
+    db.setHostName("127.0.0.1");
+    db.setDatabaseName("world");
+    db.setUserName("root");
+
+    // Your password
+    db.setPassword("your-password-goes-here");
+
+    if (db.open()) {
+        QSqlQuery query;
+        // city - predefined table from the predefined by MySQL "world" database
+        query.exec("SELECT * FROM city;");
+        while (query.next()) {
+            int id = query.value(0).toInt();
+            QString name = query.value(1).toString();
+            QString countryCode = query.value(2).toString();
+            QString district = query.value(3).toString();
+            int population = query.value(4).toInt();
+            qDebug() << "Id:" << id << "City:" << name << "Country code:" << countryCode
+                     << "District:" << district << "Population:" << population;
+        }
+    }
 }
 
 MainWindow::~MainWindow()
