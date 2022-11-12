@@ -3,6 +3,10 @@
 
 #include <QDebug>
 #include <QString>
+#include "parse.h"
+#include "schedule.h"
+
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -21,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     if (db.open()) {
         QSqlQuery query;
-        // city - predefined table from the predefined by MySQL "world" database
         query.exec("SELECT * FROM city;");
         while (query.next()) {
             int id = query.value(0).toInt();
@@ -33,6 +36,11 @@ MainWindow::MainWindow(QWidget *parent)
                      << "District:" << district << "Population:" << population;
         }
     }
+
+
+    Parse *parse = new Parse();
+    Schedule newList = parse->parseSchedule(":/myHtml/schedule.html");
+    //Schedule newList = parse->parseSchedule(":/myHtml/schedule.html");
 }
 
 MainWindow::~MainWindow()

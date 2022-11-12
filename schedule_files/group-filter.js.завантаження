@@ -1,0 +1,52 @@
+const semesterSDate = '01.09.2022';
+const semesterEDate = '31.01.2023';
+
+var items;
+var dates;
+var pane;
+
+function hideAll() {
+  items.forEach( el => $(el.parentNode).hide() );
+}
+
+function showInInterval( sdate, edate ) {
+  let sD = moment( sdate, 'DD.MM.YYYY' ).subtract(1,'days');
+  let eD = moment( edate, 'DD.MM.YYYY' ).add(1,'days');
+  hideAll();
+  dates.forEach( (el,idx) => {
+    if ( moment( el, 'DD.MM.YYYY' ).isBetween( sD, eD )) {
+      $(items[idx].parentNode).show();
+    };
+  });
+}
+
+function showSemester() {
+  showInInterval( semesterSDate, semesterEDate );
+}
+
+function showWeek() {
+  showInInterval( moment().subtract(1,'d'), moment().add(7,'days') ); 
+}
+
+$( document ).ready(function() {
+  items = document.querySelectorAll( '.col-md-6 h4' );
+  dates = Array.from(items).map( el => { return el.firstChild.data.trim(); });
+  $('.jumbotron .container h4').first().next().after( $( '<div id="filter" class="form-inline" />' ) );
+  $( 'div#filter' ).append( $( '<strong/>' ).html( 'Оберіть фільтр для розкладу: &nbsp;' ) );
+  $( 'div#filter' ).append( $('<button id="btnFullPeriod" class="btn btn-info btn-sm col-3 mr-1"> семестр </button>').on('click',showSemester) );
+  $( 'div#filter' ).append( '&nbsp;&nbsp;&nbsp;' );
+  $( 'div#filter' ).append( $('<button id="btnWeekPeriod" class="btn btn-info btn-sm col-3">на +7 днів </button>').on('click',showWeek) );
+  $( 'div#filter' ).append( '&nbsp;&nbsp;&nbsp;' );
+  $( 'div#filter' ).append( $('<label class="form-text"/>').html( 'за період - &nbsp;' ) );
+  $( 'div#filter' ).append( '<input id="period" class="form-control" size="24">' );
+  if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
+    $('#period').attr( 'readonly', 'readonly' );
+  }
+  $( '#period' ).daterangepicker({
+    locale:{format:'DD.MM.YYYY'},
+    startDate:moment(semesterSDate,'DD.MM.YYYY'),
+    endDate:moment(semesterEDate,'DD.MM.YYYY')
+  }).on('apply.daterangepicker',(ev,picker)=>{
+    showInInterval( picker.startDate.format('DD.MM.YYYY'), picker.endDate.format('DD.MM.YYYY') );
+  });
+});
