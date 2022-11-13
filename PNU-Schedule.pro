@@ -10,10 +10,16 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    schedule.cpp \
+    schedulelist.cpp \
+    utiltydb.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    schedule.h \
+    schedulelist.h \
+    utiltydb.h
 
 FORMS += \
     mainwindow.ui
