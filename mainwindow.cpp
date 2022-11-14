@@ -40,7 +40,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     Parse *parse = new Parse();
     Schedule newList = parse->parseSchedule(":/myHtml/schedule.html");
-    //Schedule newList = parse->parseSchedule(":/myHtml/schedule.html");
+
+
+    qDebug() << "Ok";
 }
 
 MainWindow::~MainWindow()

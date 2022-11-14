@@ -10,8 +10,10 @@ public:
     QString groupName;
     QList<ScheduleList> *groupSchedule;
 
+
     Schedule();
     Schedule(QString name, QList<ScheduleList> *groupSchedule);
+
 };
 
 #endif // SCHEDULE_H

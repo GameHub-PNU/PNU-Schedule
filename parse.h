@@ -20,7 +20,7 @@ private:
 
     QList<ScheduleList> * getSchedule(QString html);
 
-
+    void addScheduleList(QString valueString, QList<ScheduleList> *list);
 
 };
 
