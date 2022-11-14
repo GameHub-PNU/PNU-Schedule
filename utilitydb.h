@@ -11,12 +11,12 @@ class UtilityDB
 public:
     UtilityDB();
     bool isConnected();
-    bool isTableExists(QString tableName);
+    bool doesTableExist(QString tableName);
     void clearTable(QString tableName);
     void dropTable(QString tableName);
     void createScheduleTable(QString tableName);
     Schedule getScheduleByTableName(QString tableName);
-    void insertSchedultToTable(QString tableName, Schedule schedule);
+    void insertScheduleToTable(QString tableName, Schedule schedule);
 
 private:
     QSqlDatabase db;

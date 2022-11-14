@@ -9,9 +9,10 @@ class Schedule
 {
 public:
     QString groupName;
-    QVector<ScheduleList> *groupSchedule;
+    QList<ScheduleList> *groupSchedule;
 
     Schedule();
+    Schedule(QString name, QList<ScheduleList> *groupSchedule);
 };
 
 #endif // SCHEDULE_H

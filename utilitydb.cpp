@@ -1,22 +1,22 @@
-#include "utiltydb.h"
+#include "utilitydb.h"
 
 UtilityDB::UtilityDB() { establishConnection(); }
 
-bool UtilityDB::isConnected() { return db.open(); }
+bool UtilityDB::isConnected() { return db.isOpen(); }
 
-bool UtilityDB::isTableExists(QString tableName) {
+bool UtilityDB::doesTableExist(QString tableName) {
   return db.tables().contains(tableName);
 }
 
 void UtilityDB::clearTable(QString tableName) {
-  if (isTableExists(tableName)) {
+  if (doesTableExist(tableName)) {
     QSqlQuery query;
     query.exec("DELETE FROM " + tableName);
   }
 }
 
 void UtilityDB::dropTable(QString tableName) {
-  if (isTableExists(tableName)) {
+  if (doesTableExist(tableName)) {
     QSqlQuery query;
     query.exec("DROP TABLE " + tableName);
   }
@@ -37,7 +37,7 @@ void UtilityDB::createScheduleTable(QString tableName) {
 Schedule UtilityDB::getScheduleByTableName(QString tableName) {
   Schedule schedule;
   schedule.groupName = QString(tableName).replace("_", "-");
-  QVector<ScheduleList> *groupSchedule = new QVector<ScheduleList>();
+  QList<ScheduleList> *groupSchedule = new QList<ScheduleList>();
   QSqlQuery query;
   query.exec("SELECT * FROM " + tableName);
   while (query.next()) {
@@ -53,14 +53,14 @@ Schedule UtilityDB::getScheduleByTableName(QString tableName) {
   return schedule;
 }
 
-void UtilityDB::insertSchedultToTable(QString tableName, Schedule schedule) {
-  if (isTableExists(tableName)) {
+void UtilityDB::insertScheduleToTable(QString tableName, Schedule schedule) {
+  if (doesTableExist(tableName)) {
     QSqlQuery query;
-    QVectorIterator<ScheduleList> *iterator =
-        new QVectorIterator(*schedule.groupSchedule);
+    QListIterator<ScheduleList> *iterator =
+        new QListIterator(*schedule.groupSchedule);
     while (iterator->hasNext()) {
       ScheduleList scheduleList = iterator->next();
-      QString statemen1 =
+      QString statement =
           QString("INSERT INTO %1 (date_, name_of_day, num_of_pair, "
                   "time_stamp_of_pair, pair_description) VALUES (\"%2\", "
                   "\"%3\", %4, \"%5\", \"%6\")")
@@ -70,7 +70,7 @@ void UtilityDB::insertSchedultToTable(QString tableName, Schedule schedule) {
               .arg(scheduleList.numOfCouple)
               .arg(scheduleList.timeStapOfCouple)
               .arg(scheduleList.timeStapOfCouple);
-      query.exec(statemen1);
+      query.exec(statement);
     }
   }
 }
@@ -78,14 +78,5 @@ void UtilityDB::insertSchedultToTable(QString tableName, Schedule schedule) {
 void UtilityDB::establishConnection() {
   db = QSqlDatabase::addDatabase(DB_DRIVER_NAME);
   db.setDatabaseName(DB_FILE_PATH);
-
-  if (db.open()) {
-    QMessageBox msgBox;
-    msgBox.setText("Connected to the DB");
-    msgBox.exec();
-  } else {
-    QMessageBox msgBox;
-    msgBox.setText("Can't connect to the DB");
-    msgBox.exec();
-  }
+  db.open();
 }

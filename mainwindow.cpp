@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "utiltydb.h"
+#include "utilitydb.h"
 
 #include <QDebug>
 #include <QString>
@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     Schedule schedule;
     schedule.groupName = "KN-31";
 
-    QVector<ScheduleList> *groupSchedule = new QVector<ScheduleList>();
+    QList<ScheduleList> *groupSchedule = new QList<ScheduleList>();
     ScheduleList scheduleList;
     scheduleList.date = "22.03.2001";
     scheduleList.nameOfDay = "monday";
@@ -29,9 +29,9 @@ MainWindow::MainWindow(QWidget *parent)
     scheduleList.coupleDesc =  "C++";
     groupSchedule->push_back(scheduleList);
     schedule.groupSchedule = groupSchedule;
-    utilityDb -> insertSchedultToTable("KN_31", schedule);
+    utilityDb -> insertScheduleToTable("KN_31", schedule);
     Schedule schedule1 = utilityDb ->getScheduleByTableName("KN_31");
-    qDebug() << utilityDb -> isTableExists("KN_31");
+    qDebug() << utilityDb -> doesTableExist("KN_31");
 }
 
 MainWindow::~MainWindow()

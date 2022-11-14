@@ -13,13 +13,13 @@ SOURCES += \
     mainwindow.cpp \
     schedule.cpp \
     schedulelist.cpp \
-    utiltydb.cpp
+    utilitydb.cpp
 
 HEADERS += \
     mainwindow.h \
     schedule.h \
     schedulelist.h \
-    utiltydb.h
+    utilitydb.h
 
 FORMS += \
     mainwindow.ui
