@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "utilitydb.h"
 
 #include <QDebug>
 #include <QString>
@@ -10,29 +11,27 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // Establishing connection to databasee
-    db = QSqlDatabase::addDatabase("QMYSQL");
-    db.setHostName("127.0.0.1");
-    db.setDatabaseName("world");
-    db.setUserName("root");
+    // Some little example
+    UtilityDB* utilityDb = new UtilityDB();
+    utilityDb->dropTable("KN_31");
 
-    // Your password
-    db.setPassword("your-password-goes-here");
+    utilityDb->createScheduleTable("KN_31");
 
-    if (db.open()) {
-        QSqlQuery query;
-        // city - predefined table from the predefined by MySQL "world" database
-        query.exec("SELECT * FROM city;");
-        while (query.next()) {
-            int id = query.value(0).toInt();
-            QString name = query.value(1).toString();
-            QString countryCode = query.value(2).toString();
-            QString district = query.value(3).toString();
-            int population = query.value(4).toInt();
-            qDebug() << "Id:" << id << "City:" << name << "Country code:" << countryCode
-                     << "District:" << district << "Population:" << population;
-        }
-    }
+    Schedule schedule;
+    schedule.groupName = "KN-31";
+
+    QList<ScheduleList> *groupSchedule = new QList<ScheduleList>();
+    ScheduleList scheduleList;
+    scheduleList.date = "22.03.2001";
+    scheduleList.nameOfDay = "monday";
+    scheduleList.numOfCouple = 2;
+    scheduleList.timeStapOfCouple = "12:00 - 13:20";
+    scheduleList.coupleDesc =  "C++";
+    groupSchedule->push_back(scheduleList);
+    schedule.groupSchedule = groupSchedule;
+    utilityDb -> insertScheduleToTable("KN_31", schedule);
+    Schedule schedule1 = utilityDb ->getScheduleByTableName("KN_31");
+    qDebug() << utilityDb -> doesTableExist("KN_31");
 }
 
 MainWindow::~MainWindow()
