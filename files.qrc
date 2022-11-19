@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/myHtml">
+        <file>schedule.html</file>
+    </qresource>
+</RCC>

@@ -15,6 +15,7 @@ public:
     QString coupleDesc;
 
     ScheduleList();
+    ScheduleList(QString date, QString nameOfDay, int numOfCouple, QString timeStapOfCouple, QString coupleDesc);
 };
 
 #endif // SCHEDULELIST_H

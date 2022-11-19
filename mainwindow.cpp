@@ -4,6 +4,14 @@
 
 #include <QDebug>
 #include <QString>
+#include "parse.h"
+#include "schedule.h"
+
+
+
+
+
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -32,6 +40,9 @@ MainWindow::MainWindow(QWidget *parent)
     utilityDb -> insertScheduleToTable("KN_31", schedule);
     Schedule schedule1 = utilityDb ->getScheduleByTableName("KN_31");
     qDebug() << utilityDb -> doesTableExist("KN_31");
+    
+    Parse *parse = new Parse();
+    Schedule newList = parse->parseSchedule("https://asu.pnu.edu.ua/static/groups/1002/1002-0732.html");
 }
 
 MainWindow::~MainWindow()
