@@ -1,24 +1,22 @@
 #include "parse.h"
 #include <QDebug>
 #include <QRegularExpression>
+#include "QtNetwork"
 
 Parse::Parse()
 {
 
 }
 
-Schedule Parse::parseSchedule(QString filePath)
+Schedule Parse::parseSchedule(QString htmlLink)
 {
-    QFile html(filePath);
+    QNetworkAccessManager manager;
+    QNetworkReply *response = manager.get(QNetworkRequest(QUrl(htmlLink)));
+    QEventLoop event;
+    QAbstractAnimation::connect(response,SIGNAL(finished()),&event,SLOT(quit()));
+    event.exec();
+    QString mainHtml = response->readAll();
 
-    if(!html.open(QIODevice::ReadOnly)){
-        qDebug() << "Something wrong!";
-    }
-
-    QTextStream stream(&html);
-    stream.setCodec("UTF-8");
-    QString mainHtml = stream.readAll();
-    html.close();
 
     QString nameOfGroup = "<a title=\"Постійне посилання на тижневий розклад\" style=font-size:1\.4em>([\\S\\s]*?)</a><br>";
 

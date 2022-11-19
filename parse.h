@@ -10,7 +10,7 @@ class Parse
 public:
     Parse();
 
-    Schedule parseSchedule(QString html);
+    Schedule parseSchedule(QString htmlLink);
 
 
 

@@ -6,6 +6,10 @@
 #include "parse.h"
 #include "schedule.h"
 
+
+
+
+
 #include <QFile>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -39,7 +43,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     Parse *parse = new Parse();
-    Schedule newList = parse->parseSchedule(":/myHtml/schedule.html");
+    Schedule newList = parse->parseSchedule("https://asu.pnu.edu.ua/static/groups/1002/1002-0732.html");
+
 
 
     qDebug() << "Ok";
