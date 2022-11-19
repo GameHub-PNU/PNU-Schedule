@@ -14,14 +14,14 @@ SOURCES += \
     mainwindow.cpp \
     parse.cpp \
     schedule.cpp \
-    schedulelist.cpp
+    schedulelist.cpp \
     utilitydb.cpp
 
 HEADERS += \
     mainwindow.h \
     parse.h \
     schedule.h \
-    schedulelist.h
+    schedulelist.h \
     utilitydb.h
 
 FORMS += \
