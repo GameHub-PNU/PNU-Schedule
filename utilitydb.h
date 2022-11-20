@@ -17,6 +17,7 @@ public:
     void createScheduleTable(QString tableName);
     Schedule getScheduleByTableName(QString tableName);
     void insertScheduleToTable(QString tableName, Schedule schedule);
+    Schedule getScheduleByTableNameInRange(QString tableName, QDate startDate, QDate endDate);
 
 private:
     QSqlDatabase db;
