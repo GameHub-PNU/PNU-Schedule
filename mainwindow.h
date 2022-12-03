@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QtSql>
 #include <QSqlDatabase>
+#include "network/filedownloader.h"
 #include <parse.h>
 
 QT_BEGIN_NAMESPACE
@@ -19,9 +20,14 @@ public:
     ~MainWindow();
 
 
+private slots:
+    void on_getScheduleButton_clicked();
+    void loadAllGroups();
+
 private:
     Ui::MainWindow *ui;
     QSqlDatabase db;
+    FileDownloader *fileDownloader;
 
 };
 #endif // MAINWINDOW_H

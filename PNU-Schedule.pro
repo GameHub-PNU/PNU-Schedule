@@ -1,5 +1,4 @@
-QT       += core gui sql
-QT += network
+QT       += core gui sql network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    network/filedownloader.cpp \
     parse.cpp \
     schedule.cpp \
     schedulelist.cpp \
@@ -19,9 +19,11 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
+    network/filedownloader.h \
     parse.h \
     schedule.h \
     schedulelist.h \
+    universitygroup.h \
     utilitydb.h
 
 FORMS += \

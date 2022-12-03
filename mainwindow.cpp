@@ -7,18 +7,16 @@
 #include "parse.h"
 #include "schedule.h"
 
-
-
-
-
 #include <QFile>
+#include <QTextCodec>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    fileDownloader = new FileDownloader(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"), this);
+    connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
     // Some little example
     UtilityDB* utilityDb = new UtilityDB();
     //utilityDb->dropTable("KN_31");
@@ -49,5 +47,18 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+
+void MainWindow::loadAllGroups()
+{
+    QByteArray response = fileDownloader->downloadedData();
+    QTextCodec *codec = QTextCodec::codecForName("UTF-8");
+    QString string = codec->toUnicode(response);
+}
+
+void MainWindow::on_getScheduleButton_clicked()
+{
+// { f: 1002, i: 732, c: 4, l: 'КН-41' }
 }
 

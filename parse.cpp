@@ -25,6 +25,16 @@ Schedule Parse::parseSchedule(QString htmlLink)
     return *finalResult;
 }
 
+QVector<UniversityGroup> Parse::parseJSFileWithAllGroups(QString input)
+{
+    const int quantityOfGroups = 500;
+    QVector<UniversityGroup> allGroups(quantityOfGroups);
+    QRegularExpression regex("", QRegularExpression::UseUnicodePropertiesOption);
+
+
+    return allGroups;
+}
+
 
 QString Parse::getName(QString insertedHtml, QString inputedRegex)
 {
