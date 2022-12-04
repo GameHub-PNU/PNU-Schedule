@@ -28,6 +28,9 @@ private:
     Ui::MainWindow *ui;
     QSqlDatabase db;
     FileDownloader *fileDownloader;
+    Parse* parser;
+
+    QVector<UniversityGroup> groups;
 
 };
 #endif // MAINWINDOW_H

@@ -11,13 +11,13 @@ FileDownloader::FileDownloader(QUrl fileUrl, QObject *parent) : QObject(parent)
 
 FileDownloader::~FileDownloader() { }
 
-void FileDownloader::fileDownloaded(QNetworkReply* pReply) {
-    downloadedBytes = pReply->readAll();
+void FileDownloader::fileDownloaded(QNetworkReply* networkReply) {
+    downloadedBytes = networkReply->readAll();
     //emit a signal
-    pReply->deleteLater();
+    networkReply->deleteLater();
     emit downloaded();
 }
 
-QByteArray FileDownloader::downloadedData() const {
+QByteArray FileDownloader::getDownloadedData() const {
     return downloadedBytes;
 }
