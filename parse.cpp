@@ -25,6 +25,26 @@ Schedule Parse::parseSchedule(QString htmlLink)
     return *finalResult;
 }
 
+QVector<UniversityGroup> Parse::parseJSFileWithAllGroups(QString input)
+{
+    const int quantityOfGroups = 1100;
+    QVector<UniversityGroup> allGroups(quantityOfGroups);
+    QRegularExpression getGroupsDataRegex(R"(f:[\s\S]*?(\d{4,15}),[\s\S]*?i:[\s\S]*?(\d{1,15}),[\s\S]*?l:[\s\S]*?\'(.*)\')",
+                                          QRegularExpression::MultilineOption | QRegularExpression::UseUnicodePropertiesOption);
+    QRegularExpressionMatchIterator iterator = getGroupsDataRegex.globalMatch(input);
+    while (iterator.hasNext()) {
+        QRegularExpressionMatch match = iterator.next();
+        UniversityGroup group;
+        group.unitCode = match.captured(1).toInt();
+        group.sequenceNumber = match.captured(2).toInt();
+        group.name = match.captured(3);
+        group.name.replace(" ", "");
+        allGroups.push_back(group);
+    }
+
+    return allGroups;
+}
+
 
 QString Parse::getName(QString insertedHtml, QString inputedRegex)
 {
