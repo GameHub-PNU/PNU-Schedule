@@ -64,12 +64,9 @@ void UtilityDB::insertScheduleToTable(QString tableName, Schedule schedule) {
                     QString("INSERT INTO %1 (date_, name_of_day, num_of_pair, "
                             "time_stamp_of_pair, pair_description) VALUES (\"%2\", "
                             "\"%3\", %4, \"%5\", \"%6\")")
-                    .arg(tableName)
-                    .arg(scheduleList.date)
-                    .arg(scheduleList.nameOfDay)
-                    .arg(scheduleList.numOfCouple)
-                    .arg(scheduleList.timeStapOfCouple)
-                    .arg(scheduleList.timeStapOfCouple);
+                    .arg(tableName, scheduleList.date, scheduleList.nameOfDay,
+                         QString::number(scheduleList.numOfCouple), scheduleList.timeStapOfCouple,
+                         scheduleList.coupleDesc);
             query.exec(statement);
         }
     }
@@ -85,9 +82,7 @@ Schedule UtilityDB::getScheduleByTableNameInRange(QString tableName, QDate start
     QList<ScheduleList> *groupSchedule = new QList<ScheduleList>();
     QSqlQuery query;
     QString statement = QString("SELECT * FROM %1 WHERE substr(date_,7)||substr(date_,4,2)||substr(date_,1,2) BETWEEN '%2' AND '%3'")
-            .arg(tableName)
-            .arg(startDateStr)
-            .arg(endDateStr);
+            .arg(tableName, startDateStr, endDateStr);
     query.exec(statement);
     while (query.next()) {
         ScheduleList scheduleList;

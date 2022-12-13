@@ -5,9 +5,11 @@
 #include "schedule.h"
 
 #include <algorithm>
+#include <QCompleter>
 #include <QDebug>
 #include <QFile>
 #include <QString>
+#include <QStringList>
 #include <QTextCodec>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -18,10 +20,11 @@ MainWindow::MainWindow(QWidget *parent)
     parser = new Parse();
     fileDownloader = new FileDownloader(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"), this);
     connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
-
+    /*
     // Some little example
     UtilityDB* utilityDb = new UtilityDB();
     //utilityDb->dropTable("KN_31");
+
 
     //utilityDb->createScheduleTable("KN_31");
 
@@ -41,7 +44,7 @@ MainWindow::MainWindow(QWidget *parent)
     Schedule schedule1 = utilityDb ->getScheduleByTableName("KN_31");
     Schedule schedule2 = utilityDb ->getScheduleByTableNameInRange("KN_31", QDate(2001, 3, 22), QDate(2002, 3, 22));
     qDebug() << utilityDb -> doesTableExist("KN_31");
-    
+    */
     //Parse *parse = new Parse();
     //Schedule newList = parse->parseSchedule("https://asu.pnu.edu.ua/static/groups/1002/1002-0732.html");
 }
@@ -58,12 +61,20 @@ void MainWindow::loadAllGroups()
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QString jsFileContent = codec->toUnicode(response);
     groups = parser->parseJSFileWithAllGroups(jsFileContent);
+    QStringList groupNames;
+    std::for_each(groups.begin(), groups.end(), [this, &groupNames](UniversityGroup group) {
+        ui->allGroupsComboBox->addItem(group.name);
+        groupNames << group.name;
+    });
+    QCompleter *comboBoxCompleter = new QCompleter(groupNames, this);
+    comboBoxCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->allGroupsComboBox->setCompleter(comboBoxCompleter);
 }
 
 void MainWindow::on_getScheduleButton_clicked()
 {
    auto iterObject = std::find_if(groups.begin(), groups.end(),
-                                [this](UniversityGroup group){ return group.name == ui->groupNameLineEdit->text().trimmed();});
+                                [this](UniversityGroup group){ return group.name == ui->allGroupsComboBox->currentText().trimmed();});
 
    if (iterObject != groups.end()) {
        QString groupUnitCode = QString::number(iterObject->unitCode);
@@ -76,4 +87,9 @@ void MainWindow::on_getScheduleButton_clicked()
        QMessageBox::critical(this, "Error", "There is no such group at the university!");
    }
 }
+
+
+void MainWindow::on_startDateCalendarWidget_clicked(const QDate &date) { startFilterDate = date; }
+
+void MainWindow::on_endDateCalendarWidget_clicked(const QDate &date) { endFilterDate = date; }
 

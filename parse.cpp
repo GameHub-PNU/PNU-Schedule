@@ -27,11 +27,12 @@ Schedule Parse::parseSchedule(QString htmlLink)
 
 QVector<UniversityGroup> Parse::parseJSFileWithAllGroups(QString input)
 {
-    const int quantityOfGroups = 1100;
+    const int quantityOfGroups = 1200;
     QVector<UniversityGroup> allGroups(quantityOfGroups);
     QRegularExpression getGroupsDataRegex(R"(f:[\s\S]*?(\d{4,15}),[\s\S]*?i:[\s\S]*?(\d{1,15}),[\s\S]*?l:[\s\S]*?\'(.*)\')",
                                           QRegularExpression::MultilineOption | QRegularExpression::UseUnicodePropertiesOption);
     QRegularExpressionMatchIterator iterator = getGroupsDataRegex.globalMatch(input);
+    int counter = 0;
     while (iterator.hasNext()) {
         QRegularExpressionMatch match = iterator.next();
         UniversityGroup group;
@@ -39,9 +40,9 @@ QVector<UniversityGroup> Parse::parseJSFileWithAllGroups(QString input)
         group.sequenceNumber = match.captured(2).toInt();
         group.name = match.captured(3);
         group.name.replace(" ", "");
-        allGroups.push_back(group);
+        allGroups[counter++] = group;
     }
-
+    allGroups.resize(counter);
     return allGroups;
 }
 

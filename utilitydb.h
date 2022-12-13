@@ -24,8 +24,11 @@ private:
     void establishConnection();
     void initialSetup();
     QString DB_DRIVER_NAME = "QSQLITE";
-    QString DB_FILE_PATH = "./../../../../PNU-Schedule/database/schedule.db";
 
+    //QString DB_FILE_PATH = "./../../../../PNU-Schedule/database/schedule.db";
+
+    // My (YuraRov) DB_FILE_PATH, others should comment the line below and uncomment above
+    QString DB_FILE_PATH = "./../PNU-Schedule/database/schedule.db";
 };
 
 #endif // UTILTYDB_H
