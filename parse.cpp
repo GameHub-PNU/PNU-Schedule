@@ -46,6 +46,19 @@ QVector<UniversityGroup> Parse::parseJSFileWithAllGroups(QString input)
     return allGroups;
 }
 
+QString Parse::toLat(QString word)
+{
+    QString result = "";
+
+    char alphabetEng[26] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
+
+    //QChar alphabetUKR[26] = {'а','б','ц','д'};
+
+
+    return "";
+}
+
+
 
 QString Parse::getName(QString insertedHtml, QString inputedRegex)
 {

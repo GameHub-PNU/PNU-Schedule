@@ -14,7 +14,7 @@ public:
     Schedule parseSchedule(QString htmlLink);
     QVector<UniversityGroup> parseJSFileWithAllGroups(QString input);
 
-
+   QString toLat(QString word);
 private:
 
     QString getName(QString insertedHtml, QString inputedRegex);
@@ -22,6 +22,8 @@ private:
     QList<ScheduleList> * getSchedule(QString html);
 
     void addScheduleList(QString valueString, QList<ScheduleList> *list);
+
+
 };
 
 #endif // PARSE_H

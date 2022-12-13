@@ -81,7 +81,18 @@ void MainWindow::on_getScheduleButton_clicked()
        int amountOfDigitsInMaxGroupNumber = QString::number(groups.length()).length();
        QString groupSchedulelink = "https://asu.pnu.edu.ua/static/groups/" + groupUnitCode + '/' + groupUnitCode + '-'
                + QStringLiteral("%1").arg(iterObject->sequenceNumber, amountOfDigitsInMaxGroupNumber, 10, QLatin1Char('0')) + ".html";
+
        Schedule testScheduleList = parser->parseSchedule(groupSchedulelink);
+       UtilityDB db;
+       if(db.doesTableExist(testScheduleList.groupName)){
+           qDebug() << "EXIST";
+           //НЕ РОЗУМІЮ ЯК ДІСТАТИ ДАТУ З ЦЬОГО ПІКЕРА ЙОБАНОГО НУ НАХУЙ Я ПІШОВ ЗАКРИВАТИ ЛАБИ З ПАРАЛЕЛЬНОГО
+           //db.getScheduleByTableNameInRange(testScheduleList.groupName, , );
+       }
+       else{
+           db.createScheduleTable("English");
+           db.insertScheduleToTable(testScheduleList.groupName, testScheduleList);
+       }
    }
    else {
        QMessageBox::critical(this, "Error", "There is no such group at the university!");
