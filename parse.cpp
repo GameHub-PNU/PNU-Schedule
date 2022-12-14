@@ -119,11 +119,11 @@ void Parse::addScheduleList(QString valueString, QList<ScheduleList> * list)
 
             if(matchLocal.hasMatch()){
                 QString result = matchLocal.captured(1) + " " + matchLocal.captured(2);
-                newObj = new ScheduleList(regDate.match(valueString).captured(1).replace("\n"," "), regDate.match(valueString).captured(2),
+                newObj = new ScheduleList(QDate::fromString(regDate.match(valueString).captured(1).replace("\n",""),"dd.MM.yyyy"), regDate.match(valueString).captured(2),
                                                         match.captured(1).toInt(), timeStap, result);
             }
             else{
-                newObj = new ScheduleList(regDate.match(valueString).captured(1).replace("\n"," "), regDate.match(valueString).captured(2),
+                newObj = new ScheduleList(QDate::fromString(regDate.match(valueString).captured(1).replace("\n",""),"dd.MM.yyyy"), regDate.match(valueString).captured(2),
                                                         match.captured(1).toInt(), timeStap, match.captured(4).replace("<br>", " "));
             }
             list->append(*newObj);

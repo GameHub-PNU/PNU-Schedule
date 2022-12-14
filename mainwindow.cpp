@@ -21,27 +21,11 @@ MainWindow::MainWindow(QWidget *parent)
     fileDownloader = new FileDownloader(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"), this);
     connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
 
-
-    // todo: remove before PR
-    UtilityDB* utilityDb = new UtilityDB();
-
-    qDebug() << utilityDb -> isConnected();
-
-    utilityDb->dropTable("СОІ-32");
-    utilityDb->dropTable("KN-35");
-
-    utilityDb->createScheduleTable("СОІ-32");
-    utilityDb->createScheduleTable("KN-35");
-
-    qDebug() << utilityDb -> doesTableExist("СОІ-32");
-    qDebug() << utilityDb -> doesTableExist("KN-35");
-
-    //utilityDb->createScheduleTable("KN_31");
-    /*
     // Some little example
+    /*
+     *
     UtilityDB* utilityDb = new UtilityDB();
-    //utilityDb->dropTable("KN_31");
-
+    utilityDb->dropTable("КН-41");
 
     //utilityDb->createScheduleTable("KN_31");
 
@@ -104,11 +88,13 @@ void MainWindow::on_getScheduleButton_clicked()
        if(db.doesTableExist(testScheduleList.groupName)){
            qDebug() << "EXIST";
            //НЕ РОЗУМІЮ ЯК ДІСТАТИ ДАТУ З ЦЬОГО ПІКЕРА ЙОБАНОГО НУ НАХУЙ Я ПІШОВ ЗАКРИВАТИ ЛАБИ З ПАРАЛЕЛЬНОГО
-           //db.getScheduleByTableNameInRange(testScheduleList.groupName, , );
+           // todo: change to data from datepicker
+           auto data = db.getScheduleByTableNameInRange(testScheduleList.groupName, QDate(2022, 12, 14), QDate(2022, 12, 20));
        }
        else{
-           db.createScheduleTable("English");
+           db.createScheduleTable(testScheduleList.groupName);
            db.insertScheduleToTable(testScheduleList.groupName, testScheduleList);
+           auto data = db.getScheduleByTableNameInRange(testScheduleList.groupName, QDate(2022, 12, 14), QDate(2022, 12, 20));
        }
    }
    else {

@@ -47,7 +47,7 @@ Schedule UtilityDB::getScheduleByTableName(QString tableName) {
     query.exec("SELECT * FROM " + tableName);
     while (query.next()) {
         ScheduleList scheduleList;
-        scheduleList.date = query.value(0).toString();
+        scheduleList.date = QDate::fromString(query.value(0).toString(), "yyyy-MM-dd");
         scheduleList.nameOfDay = query.value(1).toString();
         scheduleList.numOfCouple = query.value(2).toInt();
         scheduleList.timeStapOfCouple = query.value(3).toString();
@@ -70,7 +70,7 @@ void UtilityDB::insertScheduleToTable(QString tableName, Schedule schedule) {
                     QString("INSERT INTO %1 (date_, name_of_day, num_of_pair, "
                             "time_stamp_of_pair, pair_description) VALUES (\"%2\", "
                             "\"%3\", %4, \"%5\", \"%6\")")
-                    .arg(tableName, scheduleList.date, scheduleList.nameOfDay,
+                    .arg(tableName, scheduleList.date.toString("yyyy-MM-dd"), scheduleList.nameOfDay,
                          QString::number(scheduleList.numOfCouple), scheduleList.timeStapOfCouple,
                          scheduleList.coupleDesc);
             query.exec(statement);
@@ -81,19 +81,19 @@ void UtilityDB::insertScheduleToTable(QString tableName, Schedule schedule) {
 Schedule UtilityDB::getScheduleByTableNameInRange(QString tableName, QDate startDate, QDate endDate)
 {
     tableName = decorateTableName(tableName);
-    QString dateFormat = "yyyyMMdd";
+    QString dateFormat = "yyyy-MM-dd";
     QString startDateStr = startDate.toString(dateFormat);
     QString endDateStr = endDate.toString(dateFormat);
     Schedule schedule;
     schedule.groupName = QString(tableName).replace("_", "-");
     QList<ScheduleList> *groupSchedule = new QList<ScheduleList>();
     QSqlQuery query;
-    QString statement = QString("SELECT * FROM %1 WHERE substr(date_,7)||substr(date_,4,2)||substr(date_,1,2) BETWEEN '%2' AND '%3'")
+    QString statement = QString("SELECT * FROM %1 WHERE date_ BETWEEN '%2' AND '%3'")
             .arg(tableName, startDateStr, endDateStr);
     query.exec(statement);
     while (query.next()) {
         ScheduleList scheduleList;
-        scheduleList.date = query.value(0).toString();
+        scheduleList.date = QDate::fromString(query.value(0).toString(),"yyyy-MM-dd");
         scheduleList.nameOfDay = query.value(1).toString();
         scheduleList.numOfCouple = query.value(2).toInt();
         scheduleList.timeStapOfCouple = query.value(3).toString();
