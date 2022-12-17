@@ -60,7 +60,7 @@ Schedule UtilityDB::getScheduleByTableName(QString tableName) {
 
 void UtilityDB::insertScheduleToTable(QString tableName, Schedule schedule) {
     tableName = decorateTableName(tableName);
-    if (doesTableExist(tableName)) {
+    if (doesTableExist(tableName) && db.transaction()) {
         QSqlQuery query;
         query.prepare(QString("INSERT INTO %1 (date_, name_of_day, num_of_pair, time_stamp_of_pair, pair_description) VALUES (?, ?, ?, ?, ?)").arg(tableName));
         QVariantList dates, namesOfDates, numsOfPairs, timeStampsOfPairs, pairsDescriptions;
@@ -81,7 +81,9 @@ void UtilityDB::insertScheduleToTable(QString tableName, Schedule schedule) {
         query.addBindValue(timeStampsOfPairs);
         query.addBindValue(pairsDescriptions);
 
-        if (!query.execBatch()) qDebug() << query.lastError();
+        if (!query.execBatch() || !db.commit()){
+            qDebug() << query.lastError();
+        }
     }
 }
 
