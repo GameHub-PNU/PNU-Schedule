@@ -62,19 +62,34 @@ void UtilityDB::insertScheduleToTable(QString tableName, Schedule schedule) {
     tableName = decorateTableName(tableName);
     if (doesTableExist(tableName)) {
         QSqlQuery query;
-        QListIterator<ScheduleList> *iterator =
-                new QListIterator(*schedule.groupSchedule);
+        query.prepare(QString("INSERT INTO %1 (date_, name_of_day, num_of_pair, time_stamp_of_pair, pair_description) VALUES (?, ?, ?, ?, ?)").arg(tableName));
+        QVariantList dates, namesOfDates, numsOfPairs, timeStampsOfPairs, pairsDescriptions;
+        QListIterator<ScheduleList> *iterator = new QListIterator(*schedule.groupSchedule);
+        ScheduleList scheduleList;
         while (iterator->hasNext()) {
-            ScheduleList scheduleList = iterator->next();
-            QString statement =
-                    QString("INSERT INTO %1 (date_, name_of_day, num_of_pair, "
-                            "time_stamp_of_pair, pair_description) VALUES (\"%2\", "
-                            "\"%3\", %4, \"%5\", \"%6\")")
-                    .arg(tableName, scheduleList.date.toString("yyyy-MM-dd"), scheduleList.nameOfDay,
-                         QString::number(scheduleList.numOfCouple), scheduleList.timeStapOfCouple,
-                         scheduleList.coupleDesc);
-            query.exec(statement);
+            scheduleList = iterator->next();
+//            QString statement =
+//                    QString("INSERT INTO %1 (date_, name_of_day, num_of_pair, "
+//                            "time_stamp_of_pair, pair_description) VALUES (\"%2\", "
+//                            "\"%3\", %4, \"%5\", \"%6\")")
+//                    .arg(tableName, scheduleList.date.toString("yyyy-MM-dd"), scheduleList.nameOfDay,
+//                         QString::number(scheduleList.numOfCouple), scheduleList.timeStapOfCouple,
+//                         scheduleList.coupleDesc);
+
+            dates << scheduleList.date.toString("yyyy-MM-dd");
+            namesOfDates << scheduleList.nameOfDay;
+            numsOfPairs << QString::number(scheduleList.numOfCouple);
+            timeStampsOfPairs << scheduleList.timeStapOfCouple;
+            pairsDescriptions << scheduleList.coupleDesc;
         }
+
+        query.addBindValue(dates);
+        query.addBindValue(namesOfDates);
+        query.addBindValue(numsOfPairs);
+        query.addBindValue(timeStampsOfPairs);
+        query.addBindValue(pairsDescriptions);
+
+        if (!query.execBatch()) qDebug() << query.lastError();
     }
 }
 
