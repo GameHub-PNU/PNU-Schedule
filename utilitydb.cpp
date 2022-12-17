@@ -42,16 +42,16 @@ Schedule UtilityDB::getScheduleByTableName(QString tableName) {
     tableName = decorateTableName(tableName);
     Schedule schedule;
     schedule.groupName = QString(tableName).replace("_", "-");
-    QList<ScheduleList> *groupSchedule = new QList<ScheduleList>();
+    QList<UniversityClass> *groupSchedule = new QList<UniversityClass>();
     QSqlQuery query;
     query.exec("SELECT * FROM " + tableName);
     while (query.next()) {
-        ScheduleList scheduleList;
+        UniversityClass scheduleList;
         scheduleList.date = QDate::fromString(query.value(0).toString(), "yyyy-MM-dd");
         scheduleList.nameOfDay = query.value(1).toString();
-        scheduleList.numOfCouple = query.value(2).toInt();
-        scheduleList.timeStapOfCouple = query.value(3).toString();
-        scheduleList.coupleDesc = query.value(4).toString();
+        scheduleList.numberOfClass = query.value(2).toInt();
+        scheduleList.timeStampOfClass = query.value(3).toString();
+        scheduleList.classDescription = query.value(4).toString();
         groupSchedule->push_back(scheduleList);
     }
     schedule.groupSchedule = groupSchedule;
@@ -64,15 +64,15 @@ void UtilityDB::insertScheduleToTable(QString tableName, Schedule schedule) {
         QSqlQuery query;
         query.prepare(QString("INSERT INTO %1 (date_, name_of_day, num_of_pair, time_stamp_of_pair, pair_description) VALUES (?, ?, ?, ?, ?)").arg(tableName));
         QVariantList dates, namesOfDates, numsOfPairs, timeStampsOfPairs, pairsDescriptions;
-        QListIterator<ScheduleList> *iterator = new QListIterator(*schedule.groupSchedule);
-        ScheduleList scheduleList;
+        QListIterator<UniversityClass> *iterator = new QListIterator(*schedule.groupSchedule);
+        UniversityClass scheduleList;
         while (iterator->hasNext()) {
             scheduleList = iterator->next();
             dates << scheduleList.date.toString("yyyy-MM-dd");
             namesOfDates << scheduleList.nameOfDay;
-            numsOfPairs << QString::number(scheduleList.numOfCouple);
-            timeStampsOfPairs << scheduleList.timeStapOfCouple;
-            pairsDescriptions << scheduleList.coupleDesc;
+            numsOfPairs << QString::number(scheduleList.numberOfClass);
+            timeStampsOfPairs << scheduleList.timeStampOfClass;
+            pairsDescriptions << scheduleList.classDescription;
         }
 
         query.addBindValue(dates);
@@ -93,18 +93,18 @@ Schedule UtilityDB::getScheduleByTableNameInRange(QString tableName, QDate start
     QString endDateStr = endDate.toString(dateFormat);
     Schedule schedule;
     schedule.groupName = QString(tableName).replace("_", "-");
-    QList<ScheduleList> *groupSchedule = new QList<ScheduleList>();
+    QList<UniversityClass> *groupSchedule = new QList<UniversityClass>();
     QSqlQuery query;
     QString statement = QString("SELECT * FROM %1 WHERE date_ BETWEEN '%2' AND '%3'")
             .arg(tableName, startDateStr, endDateStr);
     query.exec(statement);
     while (query.next()) {
-        ScheduleList scheduleList;
+        UniversityClass scheduleList;
         scheduleList.date = QDate::fromString(query.value(0).toString(),"yyyy-MM-dd");
         scheduleList.nameOfDay = query.value(1).toString();
-        scheduleList.numOfCouple = query.value(2).toInt();
-        scheduleList.timeStapOfCouple = query.value(3).toString();
-        scheduleList.coupleDesc = query.value(4).toString();
+        scheduleList.numberOfClass = query.value(2).toInt();
+        scheduleList.timeStampOfClass = query.value(3).toString();
+        scheduleList.classDescription = query.value(4).toString();
         groupSchedule->push_back(scheduleList);
     }
     schedule.groupSchedule = groupSchedule;

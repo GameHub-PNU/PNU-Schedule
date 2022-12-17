@@ -6,6 +6,8 @@
 #include "savedschedules.h"
 
 #include <algorithm>
+#include <future>
+
 #include <QCompleter>
 #include <QDebug>
 #include <QFile>
@@ -78,16 +80,16 @@ void MainWindow::loadAllGroups()
 
 void MainWindow::on_getScheduleButton_clicked()
 {
-    auto iterObject = std::find_if(groups.begin(), groups.end(),
-                                   [this](UniversityGroup group){ return group.name == ui->allGroupsComboBox->currentText().trimmed();});
+    auto chosenGroup = std::find_if(groups.begin(), groups.end(),
+                                   [this](UniversityGroup group){ return group.name == ui->allGroupsComboBox->currentText().trimmed(); });
 
-    if (iterObject != groups.end()) {
-        if (db->doesTableExist(iterObject->name)) {
+    if (chosenGroup != groups.end()) {
+        if (db->doesTableExist(chosenGroup->name)) {
             qDebug() << "EXIST";
-            auto data = db->getScheduleByTableNameInRange(iterObject->name, startFilterDate, endFilterDate);
+            auto data = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
         }
         else {
-            Schedule testScheduleList = getSchedule(iterObject->name);
+            Schedule testScheduleList = getSchedule(chosenGroup);
 
             QMessageBox msgBox;
             msgBox.setText("The schedule has been dowloaded");
@@ -100,6 +102,9 @@ void MainWindow::on_getScheduleButton_clicked()
             switch (msgBox.exec()) {
                 case QMessageBox::Save:
                     db->createScheduleTable(testScheduleList.groupName);
+                    // TODO: the database saving process should be done asynchronously
+                    //std::future<void> insertDBFuture = std::async(std::launch::async, &UtilityDB::insertScheduleToTable,
+                    //                                            testScheduleList.groupName, testScheduleList);
                     db->insertScheduleToTable(testScheduleList.groupName, testScheduleList);
                     settings.setValue(testScheduleList.groupName, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
                     break;
@@ -120,7 +125,6 @@ void MainWindow::on_startDateCalendarWidget_clicked(const QDate &date) { startFi
 
 void MainWindow::on_endDateCalendarWidget_clicked(const QDate &date) { endFilterDate = date; }
 
-
 void MainWindow::on_savedSchedulesButton_clicked()
 {
     QScopedPointer<SavedSchedules> dlg(new SavedSchedules());
@@ -137,22 +141,22 @@ void MainWindow::on_savedSchedulesButton_clicked()
         settings.beginGroup("schedule");
         settings.setValue(scheduleToUpdate, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
         db->clearTable(scheduleToUpdate);
-        db->insertScheduleToTable(scheduleToUpdate, getSchedule(scheduleToUpdate));
+        auto groupToUpdate = std::find_if(groups.begin(), groups.end(),
+                                          [&scheduleToUpdate](UniversityGroup group){ return group.name == scheduleToUpdate;});
+        db->insertScheduleToTable(scheduleToUpdate, getSchedule(groupToUpdate));
 
         QMessageBox::information(this, "Update schedule information", "Schedule " + scheduleToUpdate + " was successfully updated!");
     }
 
 }
 
-Schedule MainWindow::getSchedule(QString scheduleName)
+Schedule MainWindow::getSchedule(UniversityGroup* group)
 {
-    auto iterObject = std::find_if(groups.begin(), groups.end(),
-                                   [&, this](UniversityGroup group){ return group.name == scheduleName;});
-    QString groupUnitCode = QString::number(iterObject->unitCode);
+    QString groupUnitCode = QString::number(group->unitCode);
     int amountOfDigitsInMaxGroupNumber = QString::number(groups.length()).length();
     QString groupSchedulelink = "https://asu.pnu.edu.ua/static/groups/" + groupUnitCode + '/' + groupUnitCode + '-'
-            + QStringLiteral("%1").arg(iterObject->sequenceNumber, amountOfDigitsInMaxGroupNumber, 10, QLatin1Char('0')) + ".html";
+            + QStringLiteral("%1").arg(group->sequenceNumber, amountOfDigitsInMaxGroupNumber, 10, QLatin1Char('0')) + ".html";
 
-    return  parser->parseSchedule(groupSchedulelink);
+    return parser->parseSchedule(groupSchedulelink);
 }
 

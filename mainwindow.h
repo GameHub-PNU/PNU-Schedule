@@ -41,7 +41,7 @@ private:
     QDate startFilterDate = QDate::currentDate();
     QDate endFilterDate = QDate::currentDate();
 
-    Schedule getSchedule(QString scheduleName);
+    Schedule getSchedule(UniversityGroup *group);
 
 };
 #endif // MAINWINDOW_H

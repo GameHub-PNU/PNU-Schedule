@@ -2,16 +2,16 @@
 #define SCHEDULE_H
 
 #include <QString>
-#include <schedulelist.h>
+#include <universityclass.h>
 
 class Schedule
 {
 public:
     QString groupName;
-    QList<ScheduleList> *groupSchedule;
+    QList<UniversityClass> *groupSchedule;
     
     Schedule();
-    Schedule(QString name, QList<ScheduleList> *groupSchedule);
+    Schedule(QString name, QList<UniversityClass> *groupSchedule);
 };
 
 #endif // SCHEDULE_H

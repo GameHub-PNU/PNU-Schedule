@@ -72,9 +72,9 @@ QString Parser::getName(QString insertedHtml, QString inputedRegex)
     return "UNKNOWN";
 }
 
-QList<ScheduleList> * Parser::getSchedule(QString html)
+QList<UniversityClass> * Parser::getSchedule(QString html)
 {
-    QList<ScheduleList> *finalList = new QList<ScheduleList>();
+    QList<UniversityClass> *finalList = new QList<UniversityClass>();
 
     QString globalSearchString = "<h4>[\\s\\S]*?</table></div>";
     QRegularExpression reg(globalSearchString);
@@ -97,7 +97,7 @@ QList<ScheduleList> * Parser::getSchedule(QString html)
     return finalList;
 }
 
-void Parser::addScheduleList(QString valueString, QList<ScheduleList> * list)
+void Parser::addScheduleList(QString valueString, QList<UniversityClass> * list)
 {
     QString scheduleSearchString = "<td>([\\S\\s]*?)<td>([\\s\\S]*?)<br>([\\s\\S]*?)<td style=max-width:340px;overflow:hidden>([\\S\\s]*?)<tr>";
     QString datePicker = "<h4>([\\S\\s]*?)<small>([\\S\\s]*?)</small>";
@@ -110,7 +110,7 @@ void Parser::addScheduleList(QString valueString, QList<ScheduleList> * list)
 
     QRegularExpressionMatchIterator i = reg.globalMatch(valueString);
     while(i.hasNext()){
-        ScheduleList *newObj;
+        UniversityClass *newObj;
         QRegularExpressionMatch match = i.next();
         if(match.captured(4) != NULL){
 
@@ -119,11 +119,11 @@ void Parser::addScheduleList(QString valueString, QList<ScheduleList> * list)
 
             if(matchLocal.hasMatch()){
                 QString result = matchLocal.captured(1) + " " + matchLocal.captured(2);
-                newObj = new ScheduleList(QDate::fromString(regDate.match(valueString).captured(1).replace("\n",""),"dd.MM.yyyy"), regDate.match(valueString).captured(2),
+                newObj = new UniversityClass(QDate::fromString(regDate.match(valueString).captured(1).replace("\n",""),"dd.MM.yyyy"), regDate.match(valueString).captured(2),
                                                         match.captured(1).toInt(), timeStap, result);
             }
             else{
-                newObj = new ScheduleList(QDate::fromString(regDate.match(valueString).captured(1).replace("\n",""),"dd.MM.yyyy"), regDate.match(valueString).captured(2),
+                newObj = new UniversityClass(QDate::fromString(regDate.match(valueString).captured(1).replace("\n",""),"dd.MM.yyyy"), regDate.match(valueString).captured(2),
                                                         match.captured(1).toInt(), timeStap, match.captured(4).replace("<br>", " "));
             }
             list->append(*newObj);

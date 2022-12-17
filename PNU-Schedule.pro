@@ -15,7 +15,7 @@ SOURCES += \
     parser.cpp \
     savedschedules.cpp \
     schedule.cpp \
-    schedulelist.cpp \
+    universityclass.cpp \
     utilitydb.cpp
 
 HEADERS += \
@@ -24,7 +24,7 @@ HEADERS += \
     parser.h \
     savedschedules.h \
     schedule.h \
-    schedulelist.h \
+    universityclass.h \
     universitygroup.h \
     utilitydb.h
 
