@@ -68,14 +68,6 @@ void UtilityDB::insertScheduleToTable(QString tableName, Schedule schedule) {
         ScheduleList scheduleList;
         while (iterator->hasNext()) {
             scheduleList = iterator->next();
-//            QString statement =
-//                    QString("INSERT INTO %1 (date_, name_of_day, num_of_pair, "
-//                            "time_stamp_of_pair, pair_description) VALUES (\"%2\", "
-//                            "\"%3\", %4, \"%5\", \"%6\")")
-//                    .arg(tableName, scheduleList.date.toString("yyyy-MM-dd"), scheduleList.nameOfDay,
-//                         QString::number(scheduleList.numOfCouple), scheduleList.timeStapOfCouple,
-//                         scheduleList.coupleDesc);
-
             dates << scheduleList.date.toString("yyyy-MM-dd");
             namesOfDates << scheduleList.nameOfDay;
             numsOfPairs << QString::number(scheduleList.numOfCouple);
