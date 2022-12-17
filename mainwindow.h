@@ -29,14 +29,19 @@ private slots:
 
     void on_endDateCalendarWidget_clicked(const QDate &date);
 
+    void on_savedSchedulesButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     FileDownloader *fileDownloader;
     UtilityDB *db;
     Parser *parser;
-
+    QStringList savedShedulesNames;
     QVector<UniversityGroup> groups;
     QDate startFilterDate = QDate::currentDate();
     QDate endFilterDate = QDate::currentDate();
+
+    Schedule getSchedule(QString scheduleName);
+
 };
 #endif // MAINWINDOW_H

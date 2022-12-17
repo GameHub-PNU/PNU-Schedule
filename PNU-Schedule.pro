@@ -13,6 +13,7 @@ SOURCES += \
     mainwindow.cpp \
     network/filedownloader.cpp \
     parser.cpp \
+    savedschedules.cpp \
     schedule.cpp \
     schedulelist.cpp \
     utilitydb.cpp
@@ -21,13 +22,15 @@ HEADERS += \
     mainwindow.h \
     network/filedownloader.h \
     parser.h \
+    savedschedules.h \
     schedule.h \
     schedulelist.h \
     universitygroup.h \
     utilitydb.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    savedschedules.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

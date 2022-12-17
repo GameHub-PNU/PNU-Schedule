@@ -73,6 +73,19 @@
      </rect>
     </property>
    </widget>
+   <widget class="QPushButton" name="savedSchedulesButton">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>151</width>
+      <height>32</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Saved schedules</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -80,7 +93,7 @@
      <x>0</x>
      <y>0</y>
      <width>1012</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
