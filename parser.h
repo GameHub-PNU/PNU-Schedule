@@ -1,15 +1,15 @@
-#ifndef PARSE_H
-#define PARSE_H
+#ifndef PARSER_H
+#define PARSER_H
 
 #include "universitygroup.h"
 #include <schedule.h>
 #include <schedulelist.h>
 #include <QFile>
 
-class Parse
+class Parser
 {
 public:
-    Parse();
+    Parser();
 
     Schedule parseSchedule(QString htmlLink);
     QVector<UniversityGroup> parseJSFileWithAllGroups(QString input);
@@ -26,4 +26,4 @@ private:
 
 };
 
-#endif // PARSE_H
+#endif // PARSER_H

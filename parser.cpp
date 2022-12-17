@@ -1,14 +1,14 @@
-#include "parse.h"
+#include "parser.h"
 #include <QDebug>
 #include <QRegularExpression>
 #include "QtNetwork"
 
-Parse::Parse()
+Parser::Parser()
 {
 
 }
 
-Schedule Parse::parseSchedule(QString htmlLink)
+Schedule Parser::parseSchedule(QString htmlLink)
 {
     QNetworkAccessManager manager;
     QNetworkReply *response = manager.get(QNetworkRequest(QUrl(htmlLink)));
@@ -25,7 +25,7 @@ Schedule Parse::parseSchedule(QString htmlLink)
     return *finalResult;
 }
 
-QVector<UniversityGroup> Parse::parseJSFileWithAllGroups(QString input)
+QVector<UniversityGroup> Parser::parseJSFileWithAllGroups(QString input)
 {
     const int quantityOfGroups = 1200;
     QVector<UniversityGroup> allGroups(quantityOfGroups);
@@ -46,7 +46,7 @@ QVector<UniversityGroup> Parse::parseJSFileWithAllGroups(QString input)
     return allGroups;
 }
 
-QString Parse::toLat(QString word)
+QString Parser::toLat(QString word)
 {
     QString result = "";
 
@@ -60,7 +60,7 @@ QString Parse::toLat(QString word)
 
 
 
-QString Parse::getName(QString insertedHtml, QString inputedRegex)
+QString Parser::getName(QString insertedHtml, QString inputedRegex)
 {
     QRegularExpression reg(inputedRegex);
 
@@ -72,7 +72,7 @@ QString Parse::getName(QString insertedHtml, QString inputedRegex)
     return "UNKNOWN";
 }
 
-QList<ScheduleList> * Parse::getSchedule(QString html)
+QList<ScheduleList> * Parser::getSchedule(QString html)
 {
     QList<ScheduleList> *finalList = new QList<ScheduleList>();
 
@@ -97,7 +97,7 @@ QList<ScheduleList> * Parse::getSchedule(QString html)
     return finalList;
 }
 
-void Parse::addScheduleList(QString valueString, QList<ScheduleList> * list)
+void Parser::addScheduleList(QString valueString, QList<ScheduleList> * list)
 {
     QString scheduleSearchString = "<td>([\\S\\s]*?)<td>([\\s\\S]*?)<br>([\\s\\S]*?)<td style=max-width:340px;overflow:hidden>([\\S\\s]*?)<tr>";
     QString datePicker = "<h4>([\\S\\s]*?)<small>([\\S\\s]*?)</small>";

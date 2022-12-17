@@ -12,7 +12,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     network/filedownloader.cpp \
-    parse.cpp \
+    parser.cpp \
     schedule.cpp \
     schedulelist.cpp \
     utilitydb.cpp
@@ -20,7 +20,7 @@ SOURCES += \
 HEADERS += \
     mainwindow.h \
     network/filedownloader.h \
-    parse.h \
+    parser.h \
     schedule.h \
     schedulelist.h \
     universitygroup.h \

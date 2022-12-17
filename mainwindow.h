@@ -2,13 +2,11 @@
 #define MAINWINDOW_H
 
 #include "network/filedownloader.h"
-#include "parse.h"
+#include "parser.h"
+#include "utilitydb.h"
 
 #include <QDate>
 #include <QMainWindow>
-#include <QtSql>
-#include <QSqlDatabase>
-
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -33,12 +31,12 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    QSqlDatabase db;
     FileDownloader *fileDownloader;
-    Parse* parser;
+    UtilityDB *db;
+    Parser *parser;
 
     QVector<UniversityGroup> groups;
-    QDate startFilterDate;
-    QDate endFilterDate;
+    QDate startFilterDate = QDate::currentDate();
+    QDate endFilterDate = QDate::currentDate();
 };
 #endif // MAINWINDOW_H

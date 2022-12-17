@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "utilitydb.h"
-#include "parse.h"
+#include "parser.h"
 #include "schedule.h"
 
 #include <algorithm>
@@ -17,10 +17,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    parser = new Parse();
+
     fileDownloader = new FileDownloader(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"), this);
     connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
-
+    db = new UtilityDB();
+    parser = new Parser();
     // Some little example
     /*
      *
@@ -53,6 +54,9 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete fileDownloader;
+    delete db;
+    delete parser;
 }
 
 
@@ -78,23 +82,21 @@ void MainWindow::on_getScheduleButton_clicked()
                                 [this](UniversityGroup group){ return group.name == ui->allGroupsComboBox->currentText().trimmed();});
 
    if (iterObject != groups.end()) {
-       QString groupUnitCode = QString::number(iterObject->unitCode);
-       int amountOfDigitsInMaxGroupNumber = QString::number(groups.length()).length();
-       QString groupSchedulelink = "https://asu.pnu.edu.ua/static/groups/" + groupUnitCode + '/' + groupUnitCode + '-'
-               + QStringLiteral("%1").arg(iterObject->sequenceNumber, amountOfDigitsInMaxGroupNumber, 10, QLatin1Char('0')) + ".html";
-
-       Schedule testScheduleList = parser->parseSchedule(groupSchedulelink);
-       UtilityDB db;
-       if(db.doesTableExist(testScheduleList.groupName)){
+       if (db->doesTableExist(iterObject->name)) {
            qDebug() << "EXIST";
-           //НЕ РОЗУМІЮ ЯК ДІСТАТИ ДАТУ З ЦЬОГО ПІКЕРА ЙОБАНОГО НУ НАХУЙ Я ПІШОВ ЗАКРИВАТИ ЛАБИ З ПАРАЛЕЛЬНОГО
-           // todo: change to data from datepicker
-           auto data = db.getScheduleByTableNameInRange(testScheduleList.groupName, QDate(2022, 12, 14), QDate(2022, 12, 20));
+           auto data = db->getScheduleByTableNameInRange(iterObject->name, startFilterDate, endFilterDate);
+
        }
-       else{
-           db.createScheduleTable(testScheduleList.groupName);
-           db.insertScheduleToTable(testScheduleList.groupName, testScheduleList);
-           auto data = db.getScheduleByTableNameInRange(testScheduleList.groupName, QDate(2022, 12, 14), QDate(2022, 12, 20));
+       else {
+           QString groupUnitCode = QString::number(iterObject->unitCode);
+           int amountOfDigitsInMaxGroupNumber = QString::number(groups.length()).length();
+           QString groupSchedulelink = "https://asu.pnu.edu.ua/static/groups/" + groupUnitCode + '/' + groupUnitCode + '-'
+                   + QStringLiteral("%1").arg(iterObject->sequenceNumber, amountOfDigitsInMaxGroupNumber, 10, QLatin1Char('0')) + ".html";
+
+           Schedule testScheduleList = parser->parseSchedule(groupSchedulelink);
+           db->createScheduleTable(testScheduleList.groupName);
+           db->insertScheduleToTable(testScheduleList.groupName, testScheduleList);
+           auto data = db->getScheduleByTableNameInRange(testScheduleList.groupName, startFilterDate, endFilterDate);
        }
    }
    else {
