@@ -15,7 +15,7 @@ SavedSchedules::SavedSchedules(QWidget *parent) :
     headers.append("Last update");
     ui -> savedSchedulesTable->setHorizontalHeaderLabels(headers);
 
-    QSettings settings;
+    QSettings settings("Saved", "Schedules");
     settings.beginGroup("schedule");
     QStringList schedules = settings.childKeys();
 
@@ -61,7 +61,7 @@ void SavedSchedules::on_deleteSelectedButton_clicked()
     QString schedule = ui->savedSchedulesTable->item(currentIndex.row(), 0)->text();
     ui->savedSchedulesTable->removeRow(currentIndex.row());
     ui->savedSchedulesTable->setCurrentCell(0, 0);
-    QSettings settings;
+    QSettings settings("Saved", "Schedules");
     settings.beginGroup("schedule");
     settings.remove(schedule);
     listOfSchedulesToDelete.push_back(schedule);

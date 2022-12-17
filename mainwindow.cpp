@@ -18,10 +18,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QSettings settings;
-    settings.clear();
-    settings.beginGroup("schedule");
-    settings.clear();
     fileDownloader = new FileDownloader(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"), this);
     connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
     db = new UtilityDB();
@@ -98,7 +94,7 @@ void MainWindow::on_getScheduleButton_clicked()
             msgBox.setInformativeText("Do you want to save it?");
             msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
             msgBox.setDefaultButton(QMessageBox::Save);
-            QSettings settings;
+            QSettings settings("Saved", "Schedules");
             settings.beginGroup("schedule");
 
             switch (msgBox.exec()) {
@@ -137,7 +133,7 @@ void MainWindow::on_savedSchedulesButton_clicked()
 
     QString scheduleToUpdate = dlg -> getRequestedScheduleToModify();
     if (scheduleToUpdate != NULL) {
-        QSettings settings;
+        QSettings settings("Saved", "Schedules");
         settings.beginGroup("schedule");
         settings.setValue(scheduleToUpdate, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
         db->clearTable(scheduleToUpdate);
