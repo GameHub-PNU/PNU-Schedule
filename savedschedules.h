@@ -22,6 +22,8 @@ private:
     Ui::SavedSchedules *ui;
     QString requestedScheduleToModify = NULL;
     QStringList listOfSchedulesToDelete;
+    QStringList schedules;
+    void disableButtonsOnEmptySchedules();
 
 private slots:
     void on_updateDataButton_clicked();
