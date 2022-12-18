@@ -17,7 +17,7 @@ SavedSchedules::SavedSchedules(QWidget *parent) :
 
     QSettings settings("Saved", "Schedules");
     settings.beginGroup("schedule");
-    QStringList schedules = settings.childKeys();
+    schedules = settings.childKeys();
 
     int i=0;
     for (QString schedule : schedules) {
@@ -30,6 +30,8 @@ SavedSchedules::SavedSchedules(QWidget *parent) :
         ui -> savedSchedulesTable -> setItem(i,1,cellLastUpdate);
         i++;
     }
+
+    disableButtonsOnEmptySchedules();
 }
 
 SavedSchedules::~SavedSchedules()
@@ -45,6 +47,14 @@ QString SavedSchedules::getRequestedScheduleToModify()
 QStringList SavedSchedules::getListOfSchedulesToDelete()
 {
     return listOfSchedulesToDelete;
+}
+
+void SavedSchedules::disableButtonsOnEmptySchedules()
+{
+    if (schedules.isEmpty()) {
+        ui -> deleteSelectedButton -> setEnabled(false);
+        ui -> updateDataButton -> setEnabled(false);
+    }
 }
 
 void SavedSchedules::on_updateDataButton_clicked()
@@ -64,6 +74,8 @@ void SavedSchedules::on_deleteSelectedButton_clicked()
     QSettings settings("Saved", "Schedules");
     settings.beginGroup("schedule");
     settings.remove(schedule);
+    schedules.removeOne(schedule);
     listOfSchedulesToDelete.push_back(schedule);
+    disableButtonsOnEmptySchedules();
 }
 
