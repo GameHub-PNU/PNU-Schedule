@@ -4,9 +4,12 @@
 #include "network/filedownloader.h"
 #include "parser.h"
 #include "utilitydb.h"
+#include "schedule.h"
+#include "universitygroup.h"
 
 #include <QDate>
 #include <QMainWindow>
+#include <QStringList>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,6 +34,10 @@ private slots:
 
     void on_savedSchedulesButton_clicked();
 
+    void on_startDateCalendarWidget_currentPageChanged(int year, int month);
+
+    void on_endDateCalendarWidget_currentPageChanged(int year, int month);
+
 private:
     Ui::MainWindow *ui;
     FileDownloader *fileDownloader;
@@ -41,6 +48,8 @@ private:
     QDate startFilterDate = QDate::currentDate();
     QDate endFilterDate = QDate::currentDate();
 
+    void applicationSetup();
+    void fillScheduleTable(const Schedule& schedule);
     Schedule getSchedule(UniversityGroup *group);
 
 };

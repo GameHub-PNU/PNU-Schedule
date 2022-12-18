@@ -1,8 +1,9 @@
-#ifndef UTILTYDB_H
-#define UTILTYDB_H
+#ifndef UTILITYDB_H
+#define UTILITYDB_H
 
 #include <QtSql>
 #include <QSqlDatabase>
+#include <QSqlTableModel>
 #include <qmessagebox.h>
 #include "schedule.h"
 
@@ -18,7 +19,6 @@ public:
     Schedule getScheduleByTableName(QString tableName);
     void insertScheduleToTable(QString tableName, Schedule schedule);
     Schedule getScheduleByTableNameInRange(QString tableName, QDate startDate, QDate endDate);
-
 private:
     QSqlDatabase db;
     void establishConnection();
@@ -31,4 +31,4 @@ private:
     QString DB_FILE_PATH = "./../PNU-Schedule/database/schedule.db";
 };
 
-#endif // UTILTYDB_H
+#endif // UTILITYDB_H

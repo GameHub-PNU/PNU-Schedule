@@ -6,13 +6,12 @@
 #include "savedschedules.h"
 
 #include <algorithm>
-#include <future>
 
 #include <QCompleter>
 #include <QDebug>
 #include <QFile>
 #include <QString>
-#include <QStringList>
+#include <QTableWidgetItem>
 #include <QTextCodec>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -20,10 +19,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    applicationSetup();
     fileDownloader = new FileDownloader(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"), this);
     connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
-    db = new UtilityDB();
-    parser = new Parser();
+
     // Some little example
     /*
      *
@@ -61,6 +60,32 @@ MainWindow::~MainWindow()
     delete parser;
 }
 
+void MainWindow::applicationSetup()
+{
+    db = new UtilityDB();
+    parser = new Parser();
+    ui->scheduleTableWidget->setVisible(false);
+    ui->startDateCalendarWidget->setSelectedDate(QDate::currentDate());
+    ui->endDateCalendarWidget->setSelectedDate(QDate::currentDate().addDays(1));
+}
+
+void MainWindow::fillScheduleTable(const Schedule &schedule)
+{
+    QStringList header;
+    header << "Дата" << "День" << "Номер пари" << "Час" << "Опис пари";
+    ui->scheduleTableWidget->setColumnCount(header.size());
+    ui->scheduleTableWidget->setHorizontalHeaderLabels(header);
+    ui->scheduleTableWidget->setRowCount(schedule.groupSchedule->size());
+    for (int i = 0; i < schedule.groupSchedule->size(); ++i) {
+        ui->scheduleTableWidget->setItem(i, 0, new QTableWidgetItem(schedule.groupSchedule->at(i).date.toString("dd-MM-yyyy")));
+        ui->scheduleTableWidget->setItem(i, 1, new QTableWidgetItem(QString(schedule.groupSchedule->at(i).nameOfDay).replace("&#39;", "'")));
+        ui->scheduleTableWidget->setItem(i, 2, new QTableWidgetItem(QString::number(schedule.groupSchedule->at(i).numberOfClass)));
+        ui->scheduleTableWidget->setItem(i, 3, new QTableWidgetItem(schedule.groupSchedule->at(i).timeStampOfClass));
+        ui->scheduleTableWidget->setItem(i, 4, new QTableWidgetItem(schedule.groupSchedule->at(i).classDescription));
+    }
+    ui->scheduleTableWidget->setVisible(true);
+}
+
 
 void MainWindow::loadAllGroups()
 {
@@ -84,12 +109,13 @@ void MainWindow::on_getScheduleButton_clicked()
                                    [this](UniversityGroup group){ return group.name == ui->allGroupsComboBox->currentText().trimmed(); });
 
     if (chosenGroup != groups.end()) {
+        Schedule schedule;
         if (db->doesTableExist(chosenGroup->name)) {
             qDebug() << "EXIST";
-            auto data = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
+            schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
         }
         else {
-            Schedule testScheduleList = getSchedule(chosenGroup);
+            schedule = getSchedule(chosenGroup);
 
             QMessageBox msgBox;
             msgBox.setText("The schedule has been dowloaded");
@@ -101,12 +127,12 @@ void MainWindow::on_getScheduleButton_clicked()
 
             switch (msgBox.exec()) {
                 case QMessageBox::Save:
-                    db->createScheduleTable(testScheduleList.groupName);
+                    db->createScheduleTable(schedule.groupName);
                     // TODO: the database saving process should be done asynchronously
                     //std::future<void> insertDBFuture = std::async(std::launch::async, &UtilityDB::insertScheduleToTable,
                     //                                            testScheduleList.groupName, testScheduleList);
-                    db->insertScheduleToTable(testScheduleList.groupName, testScheduleList);
-                    settings.setValue(testScheduleList.groupName, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
+                    db->insertScheduleToTable(schedule.groupName, schedule);
+                    settings.setValue(schedule.groupName, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
                     break;
                 case QMessageBox::Discard:
                     break;
@@ -114,6 +140,8 @@ void MainWindow::on_getScheduleButton_clicked()
                     break;
             }
         }
+
+        fillScheduleTable(schedule);
     }
     else {
         QMessageBox::critical(this, "Error", "There is no such group at the university!");
@@ -121,9 +149,15 @@ void MainWindow::on_getScheduleButton_clicked()
 }
 
 
-void MainWindow::on_startDateCalendarWidget_clicked(const QDate &date) { startFilterDate = date; }
+void MainWindow::on_startDateCalendarWidget_clicked(const QDate &date) {
+    startFilterDate = date;
+    ui->endDateCalendarWidget->setMinimumDate(startFilterDate.addDays(1));
+}
 
-void MainWindow::on_endDateCalendarWidget_clicked(const QDate &date) { endFilterDate = date; }
+void MainWindow::on_endDateCalendarWidget_clicked(const QDate &date) {
+    endFilterDate = date;
+    ui->startDateCalendarWidget->setMaximumDate(endFilterDate.addDays(-1));
+}
 
 void MainWindow::on_savedSchedulesButton_clicked()
 {
@@ -158,5 +192,21 @@ Schedule MainWindow::getSchedule(UniversityGroup* group)
             + QStringLiteral("%1").arg(group->sequenceNumber, amountOfDigitsInMaxGroupNumber, 10, QLatin1Char('0')) + ".html";
 
     return parser->parseSchedule(groupSchedulelink);
+}
+
+
+void MainWindow::on_startDateCalendarWidget_currentPageChanged(int year, int month)
+{
+    startFilterDate = QDate(year, month, 1);
+    ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
+    emit ui->startDateCalendarWidget->clicked(startFilterDate);
+}
+
+
+void MainWindow::on_endDateCalendarWidget_currentPageChanged(int year, int month)
+{
+    endFilterDate = QDate(year, month, 1);
+    ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
+    emit ui->endDateCalendarWidget->clicked(endFilterDate);
 }
 
