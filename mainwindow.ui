@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>PNU Schedule Desktop</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="getScheduleButton">
@@ -111,7 +111,7 @@ selection-color: white;</string>
      <x>0</x>
      <y>0</y>
      <width>1143</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

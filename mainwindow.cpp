@@ -65,8 +65,12 @@ void MainWindow::applicationSetup()
     db = new UtilityDB();
     parser = new Parser();
     ui->scheduleTableWidget->setVisible(false);
-    ui->startDateCalendarWidget->setSelectedDate(QDate::currentDate());
-    ui->endDateCalendarWidget->setSelectedDate(QDate::currentDate().addDays(1));
+    startFilterDate = QDate::currentDate();
+    endFilterDate = QDate::currentDate().addDays(1);
+    ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
+    ui->startDateCalendarWidget->setMaximumDate(endFilterDate.addDays(-1));
+    ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
+    ui->endDateCalendarWidget->setMinimumDate(startFilterDate.addDays(1));
 }
 
 void MainWindow::fillScheduleTable(const Schedule &schedule)
@@ -76,6 +80,10 @@ void MainWindow::fillScheduleTable(const Schedule &schedule)
     ui->scheduleTableWidget->setColumnCount(header.size());
     ui->scheduleTableWidget->setHorizontalHeaderLabels(header);
     ui->scheduleTableWidget->setRowCount(schedule.groupSchedule->size());
+    QHeaderView* headerView = new QHeaderView(Qt::Horizontal);
+    headerView->sectionResizeMode(QHeaderView::Stretch);
+    headerView->setStretchLastSection(true);
+    ui->scheduleTableWidget->setHorizontalHeader(headerView);
     for (int i = 0; i < schedule.groupSchedule->size(); ++i) {
         ui->scheduleTableWidget->setItem(i, 0, new QTableWidgetItem(schedule.groupSchedule->at(i).date.toString("dd-MM-yyyy")));
         ui->scheduleTableWidget->setItem(i, 1, new QTableWidgetItem(QString(schedule.groupSchedule->at(i).nameOfDay).replace("&#39;", "'")));
@@ -128,9 +136,6 @@ void MainWindow::on_getScheduleButton_clicked()
             switch (msgBox.exec()) {
                 case QMessageBox::Save:
                     db->createScheduleTable(schedule.groupName);
-                    // TODO: the database saving process should be done asynchronously
-                    //std::future<void> insertDBFuture = std::async(std::launch::async, &UtilityDB::insertScheduleToTable,
-                    //                                            testScheduleList.groupName, testScheduleList);
                     db->insertScheduleToTable(schedule.groupName, schedule);
                     settings.setValue(schedule.groupName, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
                     break;
@@ -139,6 +144,7 @@ void MainWindow::on_getScheduleButton_clicked()
                 default:
                     break;
             }
+            schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
         }
 
         fillScheduleTable(schedule);
@@ -148,14 +154,31 @@ void MainWindow::on_getScheduleButton_clicked()
     }
 }
 
-
 void MainWindow::on_startDateCalendarWidget_clicked(const QDate &date) {
     startFilterDate = date;
+    ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
     ui->endDateCalendarWidget->setMinimumDate(startFilterDate.addDays(1));
+    ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
 }
 
 void MainWindow::on_endDateCalendarWidget_clicked(const QDate &date) {
     endFilterDate = date;
+    ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
+    ui->startDateCalendarWidget->setMaximumDate(endFilterDate.addDays(-1));
+    ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
+}
+
+void MainWindow::on_startDateCalendarWidget_currentPageChanged(int year, int month)
+{
+    startFilterDate = QDate(year, month, startFilterDate.day());
+    ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
+    ui->endDateCalendarWidget->setMinimumDate(startFilterDate.addDays(1));
+}
+
+void MainWindow::on_endDateCalendarWidget_currentPageChanged(int year, int month)
+{
+    endFilterDate = QDate(year, month, endFilterDate.day());
+    ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
     ui->startDateCalendarWidget->setMaximumDate(endFilterDate.addDays(-1));
 }
 
@@ -194,19 +217,4 @@ Schedule MainWindow::getSchedule(UniversityGroup* group)
     return parser->parseSchedule(groupSchedulelink);
 }
 
-
-void MainWindow::on_startDateCalendarWidget_currentPageChanged(int year, int month)
-{
-    startFilterDate = QDate(year, month, 1);
-    ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
-    emit ui->startDateCalendarWidget->clicked(startFilterDate);
-}
-
-
-void MainWindow::on_endDateCalendarWidget_currentPageChanged(int year, int month)
-{
-    endFilterDate = QDate(year, month, 1);
-    ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
-    emit ui->endDateCalendarWidget->clicked(endFilterDate);
-}
 
