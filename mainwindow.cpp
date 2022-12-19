@@ -11,6 +11,7 @@
 #include <QCompleter>
 #include <QDebug>
 #include <QFile>
+#include <QMessageBox>
 #include <QString>
 #include <QTableWidgetItem>
 #include <QTextCodec>
@@ -65,28 +66,33 @@ void MainWindow::applicationSetup()
 {
     db = new UtilityDB();
     parser = new Parser();
-    ui->scheduleTableWidget->setVisible(false);
+
     startFilterDate = QDate::currentDate();
     endFilterDate = QDate::currentDate().addDays(1);
     ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
     ui->startDateCalendarWidget->setMaximumDate(endFilterDate.addDays(-1));
     ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
     ui->endDateCalendarWidget->setMinimumDate(startFilterDate.addDays(1));
-}
 
-void MainWindow::fillScheduleTable()
-{
     QStringList header;
     header << "Дата" << "День" << "Номер пари" << "Час" << "Опис пари";
     ui->scheduleTableWidget->setColumnCount(header.size());
     ui->scheduleTableWidget->setHorizontalHeaderLabels(header);
-
-    QVector<UniversityClass> filteredUniversityClasses = filterSchedule();
-    ui->scheduleTableWidget->setRowCount(filteredUniversityClasses.size());
     QHeaderView* headerView = new QHeaderView(Qt::Horizontal);
     headerView->sectionResizeMode(QHeaderView::Stretch);
     headerView->setStretchLastSection(true);
     ui->scheduleTableWidget->setHorizontalHeader(headerView);
+}
+
+void MainWindow::fillScheduleTable()
+{
+    QVector<UniversityClass> filteredUniversityClasses = filterSchedule();
+    if (filteredUniversityClasses.empty()) {
+        congratulateUser();
+        return;
+    }
+
+    ui->scheduleTableWidget->setRowCount(filteredUniversityClasses.size());
     for (int i = 0; i < filteredUniversityClasses.size(); ++i) {
         ui->scheduleTableWidget->setItem(i, 0, new QTableWidgetItem(filteredUniversityClasses[i].date.toString("dd-MM-yyyy")));
         ui->scheduleTableWidget->setItem(i, 1, new QTableWidgetItem(QString(filteredUniversityClasses[i].nameOfDay).replace("&#39;", "'")));
@@ -94,7 +100,14 @@ void MainWindow::fillScheduleTable()
         ui->scheduleTableWidget->setItem(i, 3, new QTableWidgetItem(filteredUniversityClasses[i].timeStampOfClass));
         ui->scheduleTableWidget->setItem(i, 4, new QTableWidgetItem(filteredUniversityClasses[i].classDescription));
     }
-    ui->scheduleTableWidget->setVisible(true);
+}
+
+void MainWindow::congratulateUser()
+{
+    QMessageBox gratulationBox;
+    gratulationBox.setText("Вітаємо, у вас пар нема :)");
+    gratulationBox.setStandardButtons(QMessageBox::Ok);
+    gratulationBox.exec();
 }
 
 QVector<UniversityClass> MainWindow::filterSchedule()

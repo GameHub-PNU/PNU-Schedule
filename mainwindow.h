@@ -51,6 +51,7 @@ private:
 
     void applicationSetup();
     void fillScheduleTable();
+    void congratulateUser();
     QVector<UniversityClass> filterSchedule();
     Schedule getSchedule(UniversityGroup *group);
 
