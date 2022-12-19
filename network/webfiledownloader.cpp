@@ -1,15 +1,18 @@
 #include "webfiledownloader.h"
 
-WebFileDownloader::WebFileDownloader(QUrl fileUrl, QObject *parent) : QObject(parent)
+WebFileDownloader::WebFileDownloader(QObject *parent) : QObject(parent)
 {
     connect(&networkAccessManager, SIGNAL (finished(QNetworkReply*)),
             this, SLOT (fileDownloaded(QNetworkReply*)));
-
-    QNetworkRequest request(fileUrl);
-    networkAccessManager.get(request);
 }
 
 WebFileDownloader::~WebFileDownloader() { }
+
+void WebFileDownloader::sendGetHttpRequest(QUrl fileUrl)
+{
+    QNetworkRequest request(fileUrl);
+    networkAccessManager.get(request);
+}
 
 void WebFileDownloader::fileDownloaded(QNetworkReply* networkReply) {
     downloadedBytes = networkReply->readAll();

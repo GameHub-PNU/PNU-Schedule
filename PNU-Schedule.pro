@@ -12,6 +12,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     network/webfiledownloader.cpp \
+    network/scheduleupdater.cpp \
     parser.cpp \
     savedschedules.cpp \
     schedule.cpp \
@@ -21,6 +22,7 @@ SOURCES += \
 HEADERS += \
     mainwindow.h \
     network/webfiledownloader.h \
+    network/scheduleupdater.h \
     parser.h \
     savedschedules.h \
     schedule.h \

@@ -22,9 +22,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     applicationSetup();
-    webFileDownloader = new WebFileDownloader(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"), this);
+    webFileDownloader = new WebFileDownloader(this);
     connect(webFileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
-
+    webFileDownloader->sendGetHttpRequest(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"));
     // Some little example
     /*
      *
@@ -60,6 +60,7 @@ MainWindow::~MainWindow()
     delete webFileDownloader;
     delete db;
     delete parser;
+    delete scheduleUpdater;
 }
 
 void MainWindow::applicationSetup()
@@ -127,6 +128,7 @@ void MainWindow::loadAllGroups()
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QString jsFileContent = codec->toUnicode(response);
     groups = parser->parseJSFileWithAllGroups(jsFileContent);
+    scheduleUpdater = new ScheduleUpdater(groups.begin(), groups.length());
     QStringList groupNames;
     std::for_each(groups.begin(), groups.end(), [this, &groupNames](UniversityGroup group) {
         ui->allGroupsComboBox->addItem(group.name);

@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "network/webfiledownloader.h"
+#include "network/scheduleupdater.h"
 #include "parser.h"
 #include "utilitydb.h"
 #include "schedule.h"
@@ -40,6 +41,8 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    ScheduleUpdater *scheduleUpdater;
     WebFileDownloader *webFileDownloader;
     UtilityDB *db;
     Parser *parser;

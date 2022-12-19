@@ -11,7 +11,7 @@ class Parser
 public:
     Parser();
 
-    Schedule parseSchedule(QString htmlLink);
+    Schedule parseSchedule(QString scheduleContent);
     QVector<UniversityGroup> parseJSFileWithAllGroups(QString input);
 
    QString toLat(QString word);

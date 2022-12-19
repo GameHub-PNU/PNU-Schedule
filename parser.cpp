@@ -8,19 +8,11 @@ Parser::Parser()
 
 }
 
-Schedule Parser::parseSchedule(QString htmlLink)
+Schedule Parser::parseSchedule(QString scheduleContent)
 {
-    QNetworkAccessManager manager;
-    QNetworkReply *response = manager.get(QNetworkRequest(QUrl(htmlLink)));
-    QEventLoop event;
-    QAbstractAnimation::connect(response,SIGNAL(finished()),&event,SLOT(quit()));
-    event.exec();
-    QString mainHtml = response->readAll();
-
-
     QString nameOfGroup = "<a title=\"Постійне посилання на тижневий розклад\" style=font-size:1\.4em>([\\S\\s]*?)</a><br>";
 
-    Schedule *finalResult = new Schedule(getName(mainHtml, nameOfGroup),getSchedule(mainHtml));
+    Schedule *finalResult = new Schedule(getName(scheduleContent, nameOfGroup),getSchedule(scheduleContent));
 
     return *finalResult;
 }
