@@ -6,19 +6,19 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1012</width>
+    <width>1143</width>
     <height>775</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>PNU Schedule Desktop</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="getScheduleButton">
     <property name="geometry">
      <rect>
-      <x>570</x>
-      <y>50</y>
+      <x>650</x>
+      <y>10</y>
       <width>93</width>
       <height>29</height>
      </rect>
@@ -30,8 +30,8 @@
    <widget class="QLabel" name="groupNameTitleLabel">
     <property name="geometry">
      <rect>
-      <x>260</x>
-      <y>50</y>
+      <x>340</x>
+      <y>10</y>
       <width>141</width>
       <height>21</height>
      </rect>
@@ -43,8 +43,8 @@
    <widget class="QComboBox" name="allGroupsComboBox">
     <property name="geometry">
      <rect>
-      <x>420</x>
-      <y>50</y>
+      <x>500</x>
+      <y>10</y>
       <width>111</width>
       <height>26</height>
      </rect>
@@ -56,21 +56,27 @@
    <widget class="QCalendarWidget" name="startDateCalendarWidget">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>100</y>
-      <width>392</width>
-      <height>236</height>
+      <x>60</x>
+      <y>50</y>
+      <width>411</width>
+      <height>251</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">selection-background-color: #0078d7;</string>
     </property>
    </widget>
    <widget class="QCalendarWidget" name="endDateCalendarWidget">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>100</y>
-      <width>392</width>
-      <height>236</height>
+      <x>650</x>
+      <y>50</y>
+      <width>401</width>
+      <height>251</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">selection-background-color: #0078d7;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="savedSchedulesButton">
@@ -86,13 +92,26 @@
      <string>Saved schedules</string>
     </property>
    </widget>
+   <widget class="QTableWidget" name="scheduleTableWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>320</y>
+      <width>1121</width>
+      <height>401</height>
+     </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1012</width>
+     <width>1143</width>
      <height>24</height>
     </rect>
    </property>

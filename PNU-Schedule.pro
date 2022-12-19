@@ -11,7 +11,7 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    network/filedownloader.cpp \
+    network/webfiledownloader.cpp \
     parser.cpp \
     savedschedules.cpp \
     schedule.cpp \
@@ -20,7 +20,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
-    network/filedownloader.h \
+    network/webfiledownloader.h \
     parser.h \
     savedschedules.h \
     schedule.h \

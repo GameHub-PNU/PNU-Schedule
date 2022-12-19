@@ -1,12 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "network/filedownloader.h"
+#include "network/webfiledownloader.h"
 #include "parser.h"
 #include "utilitydb.h"
+#include "schedule.h"
+#include "universitygroup.h"
 
 #include <QDate>
 #include <QMainWindow>
+#include <QStringList>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -31,16 +34,25 @@ private slots:
 
     void on_savedSchedulesButton_clicked();
 
+    void on_startDateCalendarWidget_currentPageChanged(int year, int month);
+
+    void on_endDateCalendarWidget_currentPageChanged(int year, int month);
+
 private:
     Ui::MainWindow *ui;
-    FileDownloader *fileDownloader;
+    WebFileDownloader *webFileDownloader;
     UtilityDB *db;
     Parser *parser;
+    Schedule schedule;
     QStringList savedShedulesNames;
     QVector<UniversityGroup> groups;
     QDate startFilterDate = QDate::currentDate();
     QDate endFilterDate = QDate::currentDate();
 
+    void applicationSetup();
+    void fillScheduleTable();
+    void congratulateUser();
+    QVector<UniversityClass> filterSchedule();
     Schedule getSchedule(UniversityGroup *group);
 
 };

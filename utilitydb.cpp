@@ -1,5 +1,7 @@
 #include "utilitydb.h"
 
+#include <utility>
+
 UtilityDB::UtilityDB() { establishConnection(); }
 
 bool UtilityDB::isConnected() { return db.isOpen(); }
