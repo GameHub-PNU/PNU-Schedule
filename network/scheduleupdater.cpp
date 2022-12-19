@@ -14,6 +14,7 @@ ScheduleUpdater::ScheduleUpdater(UniversityGroup* group, int quantityOfAllGroups
     quantityOfGroups = quantityOfAllGroups;
     connect(webFileDownloader, SIGNAL(downloaded()), this, SLOT(readResponseFromScheduleServer()));
     connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateSchedule()));
+    frequencyUpdate = std::chrono::hours(2);
     updateTimer->start(frequencyUpdate);
 }
 
@@ -21,7 +22,6 @@ ScheduleUpdater::~ScheduleUpdater() {
     delete updateTimer;
     delete webFileDownloader;
     delete parser;
-    delete groupToUpdate;
 }
 
 void ScheduleUpdater::updateSchedule()
