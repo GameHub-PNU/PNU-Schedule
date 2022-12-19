@@ -131,7 +131,6 @@ void MainWindow::on_getScheduleButton_clicked()
 
     if (chosenGroup != groups.end()) {
         if (db->doesTableExist(chosenGroup->name)) {
-            qDebug() << "EXIST";
             schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
         }
         else {
@@ -150,6 +149,8 @@ void MainWindow::on_getScheduleButton_clicked()
                     db->createScheduleTable(schedule.groupName);
                     db->insertScheduleToTable(schedule.groupName, schedule);
                     settings.setValue(schedule.groupName, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
+                    ui->statusbar->showMessage("Останнє оновлення розкладу для групи " + schedule.groupName + " відбулось "
+                                               + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
                     schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
                     break;
                 case QMessageBox::Discard:
