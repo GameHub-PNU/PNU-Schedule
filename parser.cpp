@@ -75,7 +75,7 @@ QString Parser::getName(QString insertedHtml, QString inputedRegex)
 QList<UniversityClass> * Parser::getSchedule(QString html)
 {
     QList<UniversityClass> *finalList = new QList<UniversityClass>();
-
+    //qDebug() << html;
     QString globalSearchString = "<h4>[\\s\\S]*?</table></div>";
     QRegularExpression reg(globalSearchString);
 
@@ -99,7 +99,7 @@ QList<UniversityClass> * Parser::getSchedule(QString html)
 
 void Parser::addScheduleList(QString valueString, QList<UniversityClass> * list)
 {
-    QString scheduleSearchString = "<td>([\\S\\s]*?)<td>([\\s\\S]*?)<br>([\\s\\S]*?)<td style=max-width:340px;overflow:hidden>([\\S\\s]*?)<tr>";
+    QString scheduleSearchString = "<td>([\\S\\s]*?)<td>([\\s\\S]*?)<br>([\\s\\S]*?)<td style=max-width:340px;overflow:hidden>([\\S\\s]*?)(<tr>|</table>)";
     QString datePicker = "<h4>([\\S\\s]*?)<small>([\\S\\s]*?)</small>";
     QString addLinkString = "<img src=./../check.jpg>\\n<span class=remote_work>дист.</span>([\\S\\s]*?)<div class=link> <a href=\\\"([\\s\\S]*?)\\\">";
 
@@ -112,6 +112,10 @@ void Parser::addScheduleList(QString valueString, QList<UniversityClass> * list)
     while(i.hasNext()){
         UniversityClass *newObj;
         QRegularExpressionMatch match = i.next();
+        if(match.captured(1) == "6"){
+            //qDebug() << match.captured(4);
+        }
+        qDebug() << match.captured(1);
         if(match.captured(4) != NULL){
 
             QString timeStap = match.captured(2) + "-" + match.captured(3);
