@@ -63,8 +63,7 @@
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">selection-background-color: #0078d7;
-selection-color: white;</string>
+     <string notr="true">selection-background-color: #0078d7;</string>
     </property>
    </widget>
    <widget class="QCalendarWidget" name="endDateCalendarWidget">
@@ -77,8 +76,7 @@ selection-color: white;</string>
      </rect>
     </property>
     <property name="styleSheet">
-     <string notr="true">selection-background-color: #0078d7;
-selection-color: white;</string>
+     <string notr="true">selection-background-color: #0078d7;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="savedSchedulesButton">
@@ -111,7 +109,7 @@ selection-color: white;</string>
      <x>0</x>
      <y>0</y>
      <width>1143</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

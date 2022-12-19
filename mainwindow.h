@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "network/filedownloader.h"
+#include "network/webfiledownloader.h"
 #include "parser.h"
 #include "utilitydb.h"
 #include "schedule.h"
@@ -40,16 +40,18 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    FileDownloader *fileDownloader;
+    WebFileDownloader *webFileDownloader;
     UtilityDB *db;
     Parser *parser;
+    Schedule schedule;
     QStringList savedShedulesNames;
     QVector<UniversityGroup> groups;
     QDate startFilterDate = QDate::currentDate();
     QDate endFilterDate = QDate::currentDate();
 
     void applicationSetup();
-    void fillScheduleTable(const Schedule& schedule);
+    void fillScheduleTable();
+    QVector<UniversityClass> filterSchedule();
     Schedule getSchedule(UniversityGroup *group);
 
 };

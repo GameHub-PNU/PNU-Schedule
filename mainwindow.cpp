@@ -6,6 +6,7 @@
 #include "savedschedules.h"
 
 #include <algorithm>
+#include <iterator>
 
 #include <QCompleter>
 #include <QDebug>
@@ -20,8 +21,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     applicationSetup();
-    fileDownloader = new FileDownloader(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"), this);
-    connect(fileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
+    webFileDownloader = new WebFileDownloader(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"), this);
+    connect(webFileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
 
     // Some little example
     /*
@@ -55,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete fileDownloader;
+    delete webFileDownloader;
     delete db;
     delete parser;
 }
@@ -73,31 +74,43 @@ void MainWindow::applicationSetup()
     ui->endDateCalendarWidget->setMinimumDate(startFilterDate.addDays(1));
 }
 
-void MainWindow::fillScheduleTable(const Schedule &schedule)
+void MainWindow::fillScheduleTable()
 {
     QStringList header;
     header << "Дата" << "День" << "Номер пари" << "Час" << "Опис пари";
     ui->scheduleTableWidget->setColumnCount(header.size());
     ui->scheduleTableWidget->setHorizontalHeaderLabels(header);
-    ui->scheduleTableWidget->setRowCount(schedule.groupSchedule->size());
+
+    QVector<UniversityClass> filteredUniversityClasses = filterSchedule();
+    ui->scheduleTableWidget->setRowCount(filteredUniversityClasses.size());
     QHeaderView* headerView = new QHeaderView(Qt::Horizontal);
     headerView->sectionResizeMode(QHeaderView::Stretch);
     headerView->setStretchLastSection(true);
     ui->scheduleTableWidget->setHorizontalHeader(headerView);
-    for (int i = 0; i < schedule.groupSchedule->size(); ++i) {
-        ui->scheduleTableWidget->setItem(i, 0, new QTableWidgetItem(schedule.groupSchedule->at(i).date.toString("dd-MM-yyyy")));
-        ui->scheduleTableWidget->setItem(i, 1, new QTableWidgetItem(QString(schedule.groupSchedule->at(i).nameOfDay).replace("&#39;", "'")));
-        ui->scheduleTableWidget->setItem(i, 2, new QTableWidgetItem(QString::number(schedule.groupSchedule->at(i).numberOfClass)));
-        ui->scheduleTableWidget->setItem(i, 3, new QTableWidgetItem(schedule.groupSchedule->at(i).timeStampOfClass));
-        ui->scheduleTableWidget->setItem(i, 4, new QTableWidgetItem(schedule.groupSchedule->at(i).classDescription));
+    for (int i = 0; i < filteredUniversityClasses.size(); ++i) {
+        ui->scheduleTableWidget->setItem(i, 0, new QTableWidgetItem(filteredUniversityClasses[i].date.toString("dd-MM-yyyy")));
+        ui->scheduleTableWidget->setItem(i, 1, new QTableWidgetItem(QString(filteredUniversityClasses[i].nameOfDay).replace("&#39;", "'")));
+        ui->scheduleTableWidget->setItem(i, 2, new QTableWidgetItem(QString::number(filteredUniversityClasses[i].numberOfClass)));
+        ui->scheduleTableWidget->setItem(i, 3, new QTableWidgetItem(filteredUniversityClasses[i].timeStampOfClass));
+        ui->scheduleTableWidget->setItem(i, 4, new QTableWidgetItem(filteredUniversityClasses[i].classDescription));
     }
     ui->scheduleTableWidget->setVisible(true);
+}
+
+QVector<UniversityClass> MainWindow::filterSchedule()
+{
+    QVector<UniversityClass> filteredUniversityClasses;
+    std::copy_if(schedule.groupSchedule->begin(), schedule.groupSchedule->end(), std::back_inserter(filteredUniversityClasses),
+                [this](UniversityClass universityClass) {
+                    return universityClass.date >= startFilterDate && universityClass.date <= endFilterDate;
+                });
+    return filteredUniversityClasses;
 }
 
 
 void MainWindow::loadAllGroups()
 {
-    QByteArray response = fileDownloader->getDownloadedData();
+    QByteArray response = webFileDownloader->getDownloadedData();
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QString jsFileContent = codec->toUnicode(response);
     groups = parser->parseJSFileWithAllGroups(jsFileContent);
@@ -117,7 +130,6 @@ void MainWindow::on_getScheduleButton_clicked()
                                    [this](UniversityGroup group){ return group.name == ui->allGroupsComboBox->currentText().trimmed(); });
 
     if (chosenGroup != groups.end()) {
-        Schedule schedule;
         if (db->doesTableExist(chosenGroup->name)) {
             qDebug() << "EXIST";
             schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
@@ -138,16 +150,16 @@ void MainWindow::on_getScheduleButton_clicked()
                     db->createScheduleTable(schedule.groupName);
                     db->insertScheduleToTable(schedule.groupName, schedule);
                     settings.setValue(schedule.groupName, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
+                    schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
                     break;
                 case QMessageBox::Discard:
                     break;
                 default:
                     break;
             }
-            schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
         }
 
-        fillScheduleTable(schedule);
+        fillScheduleTable();
     }
     else {
         QMessageBox::critical(this, "Error", "There is no such group at the university!");

@@ -1,17 +1,17 @@
-#ifndef FILEDOWNLOADER_H
-#define FILEDOWNLOADER_H
+#ifndef WEBFILEDOWNLOADER_H
+#define WEBFILEDOWNLOADER_H
 
 #include <QObject>
 #include <QByteArray>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-class FileDownloader : public QObject
+class WebFileDownloader : public QObject
 {
     Q_OBJECT
 public:
-    explicit FileDownloader(QUrl fileUrl, QObject *parent = 0);
-    virtual ~FileDownloader();
+    explicit WebFileDownloader(QUrl fileUrl, QObject *parent = 0);
+    virtual ~WebFileDownloader();
     QByteArray getDownloadedData() const;
 
 signals:
@@ -25,4 +25,4 @@ private:
   QByteArray downloadedBytes;
 };
 
-#endif // FILEDOWNLOADER_H
+#endif // WEBFILEDOWNLOADER_H
