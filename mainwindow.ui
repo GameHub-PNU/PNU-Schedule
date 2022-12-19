@@ -101,6 +101,9 @@
       <height>401</height>
      </rect>
     </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -109,7 +112,7 @@
      <x>0</x>
      <y>0</y>
      <width>1143</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
   </widget>
