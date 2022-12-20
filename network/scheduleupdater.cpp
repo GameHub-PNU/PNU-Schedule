@@ -1,19 +1,19 @@
 #include "scheduleupdater.h"
+#include "scheduleurlgenerator.h"
 
 #include <QByteArray>
 #include <QString>
 #include <QTextCodec>
 
-ScheduleUpdater::ScheduleUpdater(UniversityGroup* group, int quantityOfAllGroups, QObject *parent)
+ScheduleUpdater::ScheduleUpdater(const QVector<UniversityGroup>& groups, QObject *parent)
     : QObject(parent)
 {
     updateTimer = new QTimer();
     webFileDownloader = new WebFileDownloader();
     parser = new Parser();
-    groupToUpdate = group;
-    quantityOfGroups = quantityOfAllGroups;
+    groupsToUpdate = groups;
     connect(webFileDownloader, SIGNAL(downloaded()), this, SLOT(readResponseFromScheduleServer()));
-    connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateSchedule()));
+    connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGroupSchedule()));
     frequencyUpdate = std::chrono::hours(2);
     updateTimer->start(frequencyUpdate);
 }
@@ -24,27 +24,34 @@ ScheduleUpdater::~ScheduleUpdater() {
     delete parser;
 }
 
-void ScheduleUpdater::updateSchedule()
+void ScheduleUpdater::immediateGroupScheduleUpdate(UniversityGroup group)
 {
-    QString groupSchedulelink = generateGroupScheduleURL();
+    QString groupSchedulelink = ScheduleURLGenerator::generateGroupScheduleURL(
+                group.unitCode, group.sequenceNumber);
+
     webFileDownloader->sendGetHttpRequest(groupSchedulelink);
 }
 
-QString ScheduleUpdater::generateGroupScheduleURL()
+Schedule ScheduleUpdater::getUpdatedSchedule()
 {
-    QString groupUnitCode = QString::number(groupToUpdate->unitCode);
-    int amountOfDigitsInMaxGroupNumber = QString::number(quantityOfGroups).length();
-    QString groupSchedulelink = "https://asu.pnu.edu.ua/static/groups/" + groupUnitCode + '/'
-            + groupUnitCode + '-'
-            + QStringLiteral("%1").arg(groupToUpdate->sequenceNumber, amountOfDigitsInMaxGroupNumber,
-                                       10, QLatin1Char('0')) + ".html";
-    return groupSchedulelink;
+    return updatedSchedule;
 }
 
-Schedule ScheduleUpdater::readResponseFromScheduleServer()
+void ScheduleUpdater::updateGroupsSchedule()
+{
+    foreach (auto group, groupsToUpdate) {
+        QString groupSchedulelink = ScheduleURLGenerator::generateGroupScheduleURL(
+                    group.unitCode, group.sequenceNumber);
+
+        webFileDownloader->sendGetHttpRequest(groupSchedulelink);
+    }
+}
+
+void ScheduleUpdater::readResponseFromScheduleServer()
 {
     QByteArray response = webFileDownloader->getDownloadedData();
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QString fileContent = codec->toUnicode(response);
-    return parser->parseSchedule(fileContent);
+    updatedSchedule = parser->parseSchedule(fileContent);
+    emit updated();
 }

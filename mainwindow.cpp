@@ -25,6 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
     webFileDownloader = new WebFileDownloader(this);
     connect(webFileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
     webFileDownloader->sendGetHttpRequest(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"));
+    scheduleUpdater = new ScheduleUpdater({});
+    connect(scheduleUpdater, SIGNAL(updated()), this, SLOT(getUpdatedSchedule()));
     // Some little example
     /*
      *
@@ -111,6 +113,7 @@ void MainWindow::congratulateUser()
     gratulationBox.exec();
 }
 
+
 QVector<UniversityClass> MainWindow::filterSchedule()
 {
     QVector<UniversityClass> filteredUniversityClasses;
@@ -128,7 +131,6 @@ void MainWindow::loadAllGroups()
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QString jsFileContent = codec->toUnicode(response);
     groups = parser->parseJSFileWithAllGroups(jsFileContent);
-    scheduleUpdater = new ScheduleUpdater(groups.begin(), groups.length());
     QStringList groupNames;
     std::for_each(groups.begin(), groups.end(), [this, &groupNames](UniversityGroup group) {
         ui->allGroupsComboBox->addItem(group.name);
@@ -139,6 +141,45 @@ void MainWindow::loadAllGroups()
     ui->allGroupsComboBox->setCompleter(comboBoxCompleter);
 }
 
+void MainWindow::getUpdatedSchedule()
+{
+    schedule = scheduleUpdater->getUpdatedSchedule();
+    auto dialogCode = showDownloadedScheduleDialogToUser();
+    switch (dialogCode) {
+        case QMessageBox::Save:
+        {
+            QSettings settings("Saved", "Schedules");
+            settings.beginGroup("schedule");
+            if (db->doesTableExist(schedule.groupName)) {
+                db->clearTable(schedule.groupName);
+            }
+            else {
+                db->createScheduleTable(schedule.groupName);
+            }
+            db->insertScheduleToTable(schedule.groupName, schedule);
+            settings.setValue(schedule.groupName, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
+            ui->statusbar->showMessage("Останнє оновлення розкладу для групи " + schedule.groupName + " відбулось "
+                                       + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
+            break;
+        }
+        case QMessageBox::Discard:
+            break;
+        default:
+            break;
+    }
+    fillScheduleTable();
+}
+
+int MainWindow::showDownloadedScheduleDialogToUser()
+{
+    QMessageBox msgBox;
+    msgBox.setText("The schedule has been dowloaded");
+    msgBox.setInformativeText("Do you want to save it?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    return msgBox.exec();
+}
+
 void MainWindow::on_getScheduleButton_clicked()
 {
     auto chosenGroup = std::find_if(groups.begin(), groups.end(),
@@ -147,35 +188,11 @@ void MainWindow::on_getScheduleButton_clicked()
     if (chosenGroup != groups.end()) {
         if (db->doesTableExist(chosenGroup->name)) {
             schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
+            fillScheduleTable();
         }
         else {
-            schedule = getSchedule(chosenGroup);
-
-            QMessageBox msgBox;
-            msgBox.setText("The schedule has been dowloaded");
-            msgBox.setInformativeText("Do you want to save it?");
-            msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
-            msgBox.setDefaultButton(QMessageBox::Save);
-            QSettings settings("Saved", "Schedules");
-            settings.beginGroup("schedule");
-
-            switch (msgBox.exec()) {
-                case QMessageBox::Save:
-                    db->createScheduleTable(schedule.groupName);
-                    db->insertScheduleToTable(schedule.groupName, schedule);
-                    settings.setValue(schedule.groupName, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
-                    ui->statusbar->showMessage("Останнє оновлення розкладу для групи " + schedule.groupName + " відбулось "
-                                               + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
-                    schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
-                    break;
-                case QMessageBox::Discard:
-                    break;
-                default:
-                    break;
-            }
+            scheduleUpdater->immediateGroupScheduleUpdate(*chosenGroup);
         }
-
-        fillScheduleTable();
     }
     else {
         QMessageBox::critical(this, "Error", "There is no such group at the university!");
@@ -222,27 +239,9 @@ void MainWindow::on_savedSchedulesButton_clicked()
 
     QString scheduleToUpdate = dlg -> getRequestedScheduleToModify();
     if (scheduleToUpdate != NULL) {
-        QSettings settings("Saved", "Schedules");
-        settings.beginGroup("schedule");
-        settings.setValue(scheduleToUpdate, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
-        db->clearTable(scheduleToUpdate);
         auto groupToUpdate = std::find_if(groups.begin(), groups.end(),
                                           [&scheduleToUpdate](UniversityGroup group){ return group.name == scheduleToUpdate;});
-        db->insertScheduleToTable(scheduleToUpdate, getSchedule(groupToUpdate));
-
-        QMessageBox::information(this, "Update schedule information", "Schedule " + scheduleToUpdate + " was successfully updated!");
+        scheduleUpdater->immediateGroupScheduleUpdate(*groupToUpdate);
+        //QMessageBox::information(this, "Update schedule information", "Schedule " + scheduleToUpdate + " was successfully updated!");
     }
-
 }
-
-Schedule MainWindow::getSchedule(UniversityGroup* group)
-{
-    QString groupUnitCode = QString::number(group->unitCode);
-    int amountOfDigitsInMaxGroupNumber = QString::number(groups.length()).length();
-    QString groupSchedulelink = "https://asu.pnu.edu.ua/static/groups/" + groupUnitCode + '/' + groupUnitCode + '-'
-            + QStringLiteral("%1").arg(group->sequenceNumber, amountOfDigitsInMaxGroupNumber, 10, QLatin1Char('0')) + ".html";
-
-    return parser->parseSchedule(groupSchedulelink);
-}
-
-

@@ -10,29 +10,33 @@
 
 #include <QObject>
 #include <QTimer>
+#include <QVector>
 
 class ScheduleUpdater : public QObject
 {
     Q_OBJECT
 public:
-    explicit ScheduleUpdater(UniversityGroup* group, int quantityOfAllGroups, QObject *parent = nullptr);
+    explicit ScheduleUpdater(const QVector<UniversityGroup>&, QObject *parent = nullptr);
     virtual ~ScheduleUpdater();
+    void immediateGroupScheduleUpdate(UniversityGroup);
+    Schedule getUpdatedSchedule();
+signals:
+    void updated();
+
+public slots:
+    void updateGroupsSchedule();
 
 private slots:
-    void updateSchedule();
-    Schedule readResponseFromScheduleServer();
+    void readResponseFromScheduleServer();
 
 private:
     QTimer* updateTimer;
 
     WebFileDownloader* webFileDownloader;
     Parser* parser;
-    UniversityGroup* groupToUpdate;
-    int quantityOfGroups;
+    QVector<UniversityGroup> groupsToUpdate;
+    Schedule updatedSchedule;
     std::chrono::hours frequencyUpdate;
-
-    QString generateGroupScheduleURL();
-
 };
 
 #endif // SCHEDULEUPDATER_H

@@ -26,8 +26,10 @@ public:
 
 
 private slots:
-    void on_getScheduleButton_clicked();
     void loadAllGroups();
+    void getUpdatedSchedule();
+    void on_getScheduleButton_clicked();
+
 
     void on_startDateCalendarWidget_clicked(const QDate &date);
 
@@ -55,6 +57,7 @@ private:
     void applicationSetup();
     void fillScheduleTable();
     void congratulateUser();
+    int showDownloadedScheduleDialogToUser();
     QVector<UniversityClass> filterSchedule();
     Schedule getSchedule(UniversityGroup *group);
 
