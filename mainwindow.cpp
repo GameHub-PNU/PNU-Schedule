@@ -153,7 +153,7 @@ void MainWindow::saveUpdatedSchedule()
     QString currentTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm");
     settings.setValue(schedule.groupName, currentTime);
     ui->statusbar->showMessage("Дані для групи " + schedule.groupName
-                               + " були успішно збережні (" + currentTime + ")", 6000);
+                               + " були успішно збережені (" + currentTime + ")", 6000);
 }
 
 void MainWindow::getUpdatedSchedule(bool wasUpdateFromDialog)
