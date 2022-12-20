@@ -239,8 +239,16 @@ void MainWindow::on_savedSchedulesButton_clicked()
     dlg->exec();
 
     QStringList schedulesToDelete = dlg->getListOfSchedulesToDelete();
-    for (QString schedule : schedulesToDelete) {
-        db->dropTable(schedule);
+    if (!schedulesToDelete.isEmpty()) {
+        QString schedulesMessage = "";
+        for (int i = 0; i < schedulesToDelete.size(); ++i) {
+            db->dropTable(schedulesToDelete[i]);
+            schedulesMessage.append(schedulesToDelete[i]);
+            if (i < schedulesToDelete.size()-1) {
+                schedulesMessage.append(", ");
+            }
+        }
+        QMessageBox::information(this, "Delete schedule information", "Schedules: " + schedulesMessage + " - successfully deleted!");
     }
 
     QString scheduleToUpdate = dlg -> getRequestedScheduleToModify();
