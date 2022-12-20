@@ -46,16 +46,21 @@ private:
     Ui::MainWindow *ui;
 
     ScheduleUpdater *scheduleUpdater;
-    WebFileDownloader *webFileDownloader;
+    WebFileDownloader *webFileDownloader = nullptr;
     UtilityDB *db;
     Parser *parser;
     Schedule schedule;
-    QStringList savedShedulesNames;
-    QVector<UniversityGroup> groups;
+    QVector<UniversityGroup> universityGroups;
     QDate startFilterDate = QDate::currentDate();
-    QDate endFilterDate = QDate::currentDate();
+    QDate endFilterDate = QDate::currentDate().addDays(1);
+
+    //const QString GROUPS_FILE_PATH = "./../../../../PNU-Schedule/database/university-groups.txt";
+
+    // My (YuraRov) GROUPS_FILE_PATH, others should comment the line below and uncomment above
+    const QString GROUPS_FILE_PATH = "./../PNU-Schedule/database/university-groups.txt";
 
     void applicationSetup();
+    void saveGroupsToFile();
     void fillScheduleTable();
     void congratulateUser();
     int showDownloadedScheduleDialogToUser();

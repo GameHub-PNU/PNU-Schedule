@@ -15,6 +15,7 @@
 #include <QString>
 #include <QTableWidgetItem>
 #include <QTextCodec>
+#include <QTextStream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -22,9 +23,25 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     applicationSetup();
-    webFileDownloader = new WebFileDownloader(this);
-    connect(webFileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
-    webFileDownloader->sendGetHttpRequest(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"));
+    if (!QFile::exists(GROUPS_FILE_PATH)) {
+        webFileDownloader = new WebFileDownloader(this);
+        connect(webFileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
+        webFileDownloader->sendGetHttpRequest(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"));
+    }
+    else {
+        QFile fileWithUniversityGroups(GROUPS_FILE_PATH);
+        if (fileWithUniversityGroups.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream stream(&fileWithUniversityGroups);
+            while (!fileWithUniversityGroups.atEnd()) {
+                UniversityGroup group;
+                stream >> group.unitCode >> group.sequenceNumber >> group.name;
+                ui->allGroupsComboBox->addItem(group.name);
+                universityGroups.push_back(group);
+            }
+
+            fileWithUniversityGroups.close();
+        }
+    }
     scheduleUpdater = new ScheduleUpdater({});
     connect(scheduleUpdater, SIGNAL(updated(bool)), this, SLOT(getUpdatedSchedule(bool)));
 }
@@ -32,7 +49,9 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
-    delete webFileDownloader;
+    if (webFileDownloader != nullptr) {
+        delete webFileDownloader;
+    }
     delete db;
     delete parser;
     delete scheduleUpdater;
@@ -43,8 +62,6 @@ void MainWindow::applicationSetup()
     db = new UtilityDB();
     parser = new Parser();
 
-    startFilterDate = QDate::currentDate();
-    endFilterDate = QDate::currentDate().addDays(1);
     ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
     ui->startDateCalendarWidget->setMaximumDate(endFilterDate.addDays(-1));
     ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
@@ -58,6 +75,20 @@ void MainWindow::applicationSetup()
     headerView->sectionResizeMode(QHeaderView::Stretch);
     headerView->setStretchLastSection(true);
     ui->scheduleTableWidget->setHorizontalHeader(headerView);
+}
+
+void MainWindow::saveGroupsToFile()
+{
+    QFile fileWithUniversityGroups(GROUPS_FILE_PATH);
+    if (fileWithUniversityGroups.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QTextStream stream(&fileWithUniversityGroups);
+        stream.setCodec("UTF-8");
+        foreach (auto group, universityGroups) {
+            stream << group.unitCode << ' ' << group.sequenceNumber << ' ' << group.name << '\n';
+        }
+
+        fileWithUniversityGroups.close();
+    }
 }
 
 void MainWindow::fillScheduleTable()
@@ -102,15 +133,16 @@ void MainWindow::loadAllGroups()
     QByteArray response = webFileDownloader->getDownloadedData();
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QString jsFileContent = codec->toUnicode(response);
-    groups = parser->parseJSFileWithAllGroups(jsFileContent);
+    universityGroups = parser->parseJSFileWithAllGroups(jsFileContent);
     QStringList groupNames;
-    std::for_each(groups.begin(), groups.end(), [this, &groupNames](UniversityGroup group) {
+    std::for_each(universityGroups.begin(), universityGroups.end(), [this, &groupNames](UniversityGroup group) {
         ui->allGroupsComboBox->addItem(group.name);
         groupNames << group.name;
     });
     QCompleter *comboBoxCompleter = new QCompleter(groupNames, this);
     comboBoxCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     ui->allGroupsComboBox->setCompleter(comboBoxCompleter);
+    saveGroupsToFile();
 }
 
 void MainWindow::saveUpdatedSchedule()
@@ -161,10 +193,10 @@ int MainWindow::showDownloadedScheduleDialogToUser()
 
 void MainWindow::on_getScheduleButton_clicked()
 {
-    auto chosenGroup = std::find_if(groups.begin(), groups.end(),
+    auto chosenGroup = std::find_if(universityGroups.begin(), universityGroups.end(),
                                    [this](UniversityGroup group){ return group.name == ui->allGroupsComboBox->currentText().trimmed(); });
 
-    if (chosenGroup != groups.end()) {
+    if (chosenGroup != universityGroups.end()) {
         if (db->doesTableExist(chosenGroup->name)) {
             schedule = db->getScheduleByTableNameInRange(chosenGroup->name, startFilterDate, endFilterDate);
             fillScheduleTable();
@@ -226,7 +258,7 @@ void MainWindow::on_savedSchedulesButton_clicked()
 
     QString scheduleToUpdate = dlg -> getRequestedScheduleToModify();
     if (scheduleToUpdate != NULL) {
-        auto groupToUpdate = std::find_if(groups.begin(), groups.end(),
+        auto groupToUpdate = std::find_if(universityGroups.begin(), universityGroups.end(),
                                           [&scheduleToUpdate](UniversityGroup group){ return group.name == scheduleToUpdate;});
         scheduleUpdater->immediateGroupScheduleUpdate(*groupToUpdate, true);
     }
