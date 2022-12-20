@@ -11,9 +11,10 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>PNU Schedule Desktop</string>
+   <string>Розклад ПНУ</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+<<<<<<< HEAD
    <widget class="QPushButton" name="getScheduleButton">
     <property name="geometry">
      <rect>
@@ -105,6 +106,76 @@
      <set>QAbstractItemView::NoEditTriggers</set>
     </property>
    </widget>
+=======
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QLabel" name="groupNameTitleLabel">
+        <property name="text">
+         <string>Оберіть групу:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="allGroupsComboBox">
+        <property name="editable">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="getScheduleButton">
+        <property name="text">
+         <string>Показати</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="savedSchedulesButton">
+        <property name="text">
+         <string>Збережені групи</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QCalendarWidget" name="startDateCalendarWidget">
+        <property name="styleSheet">
+         <string notr="true">selection-background-color: #0078d7;</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCalendarWidget" name="endDateCalendarWidget">
+        <property name="styleSheet">
+         <string notr="true">selection-background-color: #0078d7;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QTableWidget" name="scheduleTableWidget"/>
+    </item>
+   </layout>
+>>>>>>> 8c6e8a8 (Changed UI language and add minimal layout)
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Збережені групи</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -26,14 +26,14 @@
      <item>
       <widget class="QPushButton" name="updateDataButton">
        <property name="text">
-        <string>Update selected</string>
+        <string>Оновити виділене</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="deleteSelectedButton">
        <property name="text">
-        <string>Delete selected</string>
+        <string>Видалити виділене</string>
        </property>
       </widget>
      </item>

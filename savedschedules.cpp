@@ -11,8 +11,8 @@ SavedSchedules::SavedSchedules(QWidget *parent) :
     ui -> savedSchedulesTable -> setColumnWidth(0, 130);
     ui -> savedSchedulesTable -> setColumnWidth(1, 200);
     QStringList headers;
-    headers.append("Schedule");
-    headers.append("Last update");
+    headers.append("Група");
+    headers.append("Останнє оновлення");
     ui -> savedSchedulesTable->setHorizontalHeaderLabels(headers);
 
     QSettings settings("Saved", "Schedules");

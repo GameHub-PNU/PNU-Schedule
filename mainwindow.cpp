@@ -27,33 +27,6 @@ MainWindow::MainWindow(QWidget *parent)
     webFileDownloader->sendGetHttpRequest(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"));
     scheduleUpdater = new ScheduleUpdater({});
     connect(scheduleUpdater, SIGNAL(updated(bool)), this, SLOT(getUpdatedSchedule(bool)));
-    // Some little example
-    /*
-     *
-    UtilityDB* utilityDb = new UtilityDB();
-    utilityDb->dropTable("КН-41");
-
-    //utilityDb->createScheduleTable("KN_31");
-
-    Schedule schedule;
-    schedule.groupName = "KN-31";
-
-    QList<ScheduleList> *groupSchedule = new QList<ScheduleList>();
-    ScheduleList scheduleList;
-    scheduleList.date = "22.05.2001";
-    scheduleList.nameOfDay = "monday";
-    scheduleList.numOfCouple = 2;
-    scheduleList.timeStapOfCouple = "12:00 - 13:20";
-    scheduleList.coupleDesc =  "C++";
-    groupSchedule->push_back(scheduleList);
-    schedule.groupSchedule = groupSchedule;
-    utilityDb -> insertScheduleToTable("KN_31", schedule);
-    Schedule schedule1 = utilityDb ->getScheduleByTableName("KN_31");
-    Schedule schedule2 = utilityDb ->getScheduleByTableNameInRange("KN_31", QDate(2001, 3, 22), QDate(2002, 3, 22));
-    qDebug() << utilityDb -> doesTableExist("KN_31");
-    */
-    //Parse *parse = new Parse();
-    //Schedule newList = parse->parseSchedule("https://asu.pnu.edu.ua/static/groups/1002/1002-0732.html");
 }
 
 MainWindow::~MainWindow()
@@ -147,8 +120,8 @@ void MainWindow::saveUpdatedSchedule()
     db->insertScheduleToTable(schedule.groupName, schedule);
     QString currentTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm");
     settings.setValue(schedule.groupName, currentTime);
-    ui->statusbar->showMessage("Останнє оновлення розкладу для групи " + schedule.groupName
-                               + " відбулось " + currentTime);
+    ui->statusbar->showMessage("Дані для групи " + schedule.groupName
+                               + " були успішно збережні (" + currentTime + ")", 5000);
 }
 
 void MainWindow::getUpdatedSchedule(bool wasUpdateFromDialog)
@@ -157,8 +130,8 @@ void MainWindow::getUpdatedSchedule(bool wasUpdateFromDialog)
     if (wasUpdateFromDialog) {
         db->clearTable(schedule.groupName);
         saveUpdatedSchedule();
-        QMessageBox::information(this, "Update schedule information",
-                                 "Schedule " + schedule.groupName + " was successfully updated!");
+        QMessageBox::information(this, "Інформація про оновлення",
+                                 "Розклад групи " + schedule.groupName + " був успішно оновлений!");
     }
     else {
         auto dialogCode = showDownloadedScheduleDialogToUser();
@@ -179,8 +152,8 @@ void MainWindow::getUpdatedSchedule(bool wasUpdateFromDialog)
 int MainWindow::showDownloadedScheduleDialogToUser()
 {
     QMessageBox msgBox;
-    msgBox.setText("The schedule has been dowloaded");
-    msgBox.setInformativeText("Do you want to save it?");
+    msgBox.setText("Розклад було отримано");
+    msgBox.setInformativeText("Чи хочете ви зберегти його?");
     msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
     msgBox.setDefaultButton(QMessageBox::Save);
     return msgBox.exec();
@@ -201,7 +174,7 @@ void MainWindow::on_getScheduleButton_clicked()
         }
     }
     else {
-        QMessageBox::critical(this, "Error", "There is no such group at the university!");
+        QMessageBox::critical(this, "Помилка", "Обраної групи в університеті немає!");
     }
 }
 
@@ -248,7 +221,7 @@ void MainWindow::on_savedSchedulesButton_clicked()
                 schedulesMessage.append(", ");
             }
         }
-        QMessageBox::information(this, "Delete schedule information", "Schedules: " + schedulesMessage + " - successfully deleted!");
+        QMessageBox::information(this, "Інформація про видалення", "Розклади " + schedulesMessage + " - успішно видалено!");
     }
 
     QString scheduleToUpdate = dlg -> getRequestedScheduleToModify();
