@@ -63,9 +63,9 @@ void MainWindow::applicationSetup()
     parser = new Parser();
 
     ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
-    ui->startDateCalendarWidget->setMaximumDate(endFilterDate.addDays(-1));
+    ui->startDateCalendarWidget->setMaximumDate(endFilterDate);
     ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
-    ui->endDateCalendarWidget->setMinimumDate(startFilterDate.addDays(1));
+    ui->endDateCalendarWidget->setMinimumDate(startFilterDate);
 
     QStringList header;
     header << "Дата" << "День" << "Номер пари" << "Час" << "Опис пари";
@@ -153,7 +153,7 @@ void MainWindow::saveUpdatedSchedule()
     QString currentTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm");
     settings.setValue(schedule.groupName, currentTime);
     ui->statusbar->showMessage("Дані для групи " + schedule.groupName
-                               + " були успішно збережні (" + currentTime + ")", 5000);
+                               + " були успішно збережні (" + currentTime + ")", 6000);
 }
 
 void MainWindow::getUpdatedSchedule(bool wasUpdateFromDialog)
@@ -213,14 +213,14 @@ void MainWindow::on_getScheduleButton_clicked()
 void MainWindow::on_startDateCalendarWidget_clicked(const QDate &date) {
     startFilterDate = date;
     ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
-    ui->endDateCalendarWidget->setMinimumDate(startFilterDate.addDays(1));
+    ui->endDateCalendarWidget->setMinimumDate(startFilterDate);
     ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
 }
 
 void MainWindow::on_endDateCalendarWidget_clicked(const QDate &date) {
     endFilterDate = date;
     ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
-    ui->startDateCalendarWidget->setMaximumDate(endFilterDate.addDays(-1));
+    ui->startDateCalendarWidget->setMaximumDate(endFilterDate);
     ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
 }
 
@@ -228,14 +228,14 @@ void MainWindow::on_startDateCalendarWidget_currentPageChanged(int year, int mon
 {
     startFilterDate = QDate(year, month, startFilterDate.day());
     ui->startDateCalendarWidget->setSelectedDate(startFilterDate);
-    ui->endDateCalendarWidget->setMinimumDate(startFilterDate.addDays(1));
+    ui->endDateCalendarWidget->setMinimumDate(startFilterDate);
 }
 
 void MainWindow::on_endDateCalendarWidget_currentPageChanged(int year, int month)
 {
     endFilterDate = QDate(year, month, endFilterDate.day());
     ui->endDateCalendarWidget->setSelectedDate(endFilterDate);
-    ui->startDateCalendarWidget->setMaximumDate(endFilterDate.addDays(-1));
+    ui->startDateCalendarWidget->setMaximumDate(endFilterDate);
 }
 
 void MainWindow::on_savedSchedulesButton_clicked()

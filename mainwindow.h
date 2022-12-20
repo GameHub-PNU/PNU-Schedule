@@ -52,7 +52,7 @@ private:
     Schedule schedule;
     QVector<UniversityGroup> universityGroups;
     QDate startFilterDate = QDate::currentDate();
-    QDate endFilterDate = QDate::currentDate().addDays(1);
+    QDate endFilterDate = QDate::currentDate();
 
     //const QString GROUPS_FILE_PATH = "./../../../../PNU-Schedule/database/university-groups.txt";
 

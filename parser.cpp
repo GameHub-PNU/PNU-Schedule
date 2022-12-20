@@ -1,16 +1,11 @@
 #include "parser.h"
+
 #include <QDebug>
 #include <QRegularExpression>
-#include "QtNetwork"
-
-Parser::Parser()
-{
-
-}
 
 Schedule Parser::parseSchedule(QString scheduleContent)
 {
-    QString nameOfGroup = "<a title=\"Постійне посилання на тижневий розклад\" style=font-size:1\.4em>([\\S\\s]*?)</a><br>";
+    QString nameOfGroup = "<a title=\"Постійне посилання на тижневий розклад\" style=font-size:1\\.4em>([\\S\\s]*?)</a><br>";
 
     Schedule *finalResult = new Schedule(getName(scheduleContent, nameOfGroup),getSchedule(scheduleContent));
 
@@ -38,20 +33,6 @@ QVector<UniversityGroup> Parser::parseJSFileWithAllGroups(QString input)
     return allGroups;
 }
 
-QString Parser::toLat(QString word)
-{
-    QString result = "";
-
-    char alphabetEng[26] = {'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'};
-
-    //QChar alphabetUKR[26] = {'а','б','ц','д'};
-
-
-    return "";
-}
-
-
-
 QString Parser::getName(QString insertedHtml, QString inputedRegex)
 {
     QRegularExpression reg(inputedRegex);
@@ -67,11 +48,8 @@ QString Parser::getName(QString insertedHtml, QString inputedRegex)
 QList<UniversityClass> * Parser::getSchedule(QString html)
 {
     QList<UniversityClass> *finalList = new QList<UniversityClass>();
-    //qDebug() << html;
     QString globalSearchString = "<h4>[\\s\\S]*?</table></div>";
     QRegularExpression reg(globalSearchString);
-
-
 
     QStringList globalBlocksList;
     QRegularExpressionMatchIterator i = reg.globalMatch(html);
@@ -104,10 +82,6 @@ void Parser::addScheduleList(QString valueString, QList<UniversityClass> * list)
     while(i.hasNext()){
         UniversityClass *newObj;
         QRegularExpressionMatch match = i.next();
-        if(match.captured(1) == "6"){
-            //qDebug() << match.captured(4);
-        }
-        qDebug() << match.captured(1);
         if(match.captured(4) != NULL){
 
             QString timeStap = match.captured(2) + "-" + match.captured(3);
