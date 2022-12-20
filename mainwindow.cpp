@@ -26,7 +26,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(webFileDownloader, SIGNAL(downloaded()), this, SLOT(loadAllGroups()));
     webFileDownloader->sendGetHttpRequest(QUrl("https://asu.pnu.edu.ua/data/groups-list.js"));
     scheduleUpdater = new ScheduleUpdater({});
-    connect(scheduleUpdater, SIGNAL(updated()), this, SLOT(getUpdatedSchedule()));
+    connect(scheduleUpdater, SIGNAL(updated(bool)), this, SLOT(getUpdatedSchedule(bool)));
     // Some little example
     /*
      *
@@ -124,7 +124,6 @@ QVector<UniversityClass> MainWindow::filterSchedule()
     return filteredUniversityClasses;
 }
 
-
 void MainWindow::loadAllGroups()
 {
     QByteArray response = webFileDownloader->getDownloadedData();
@@ -141,31 +140,38 @@ void MainWindow::loadAllGroups()
     ui->allGroupsComboBox->setCompleter(comboBoxCompleter);
 }
 
-void MainWindow::getUpdatedSchedule()
+void MainWindow::saveUpdatedSchedule()
+{
+    QSettings settings("Saved", "Schedules");
+    settings.beginGroup("schedule");
+    db->insertScheduleToTable(schedule.groupName, schedule);
+    QString currentTime = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm");
+    settings.setValue(schedule.groupName, currentTime);
+    ui->statusbar->showMessage("Останнє оновлення розкладу для групи " + schedule.groupName
+                               + " відбулось " + currentTime);
+}
+
+void MainWindow::getUpdatedSchedule(bool wasUpdateFromDialog)
 {
     schedule = scheduleUpdater->getUpdatedSchedule();
-    auto dialogCode = showDownloadedScheduleDialogToUser();
-    switch (dialogCode) {
-        case QMessageBox::Save:
-        {
-            QSettings settings("Saved", "Schedules");
-            settings.beginGroup("schedule");
-            if (db->doesTableExist(schedule.groupName)) {
-                db->clearTable(schedule.groupName);
-            }
-            else {
+    if (wasUpdateFromDialog) {
+        db->clearTable(schedule.groupName);
+        saveUpdatedSchedule();
+        QMessageBox::information(this, "Update schedule information",
+                                 "Schedule " + schedule.groupName + " was successfully updated!");
+    }
+    else {
+        auto dialogCode = showDownloadedScheduleDialogToUser();
+        switch (dialogCode) {
+            case QMessageBox::Save:
+            {
                 db->createScheduleTable(schedule.groupName);
+                saveUpdatedSchedule();
+                break;
             }
-            db->insertScheduleToTable(schedule.groupName, schedule);
-            settings.setValue(schedule.groupName, QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
-            ui->statusbar->showMessage("Останнє оновлення розкладу для групи " + schedule.groupName + " відбулось "
-                                       + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm"));
-            break;
+            default:
+                break;
         }
-        case QMessageBox::Discard:
-            break;
-        default:
-            break;
     }
     fillScheduleTable();
 }
@@ -191,7 +197,7 @@ void MainWindow::on_getScheduleButton_clicked()
             fillScheduleTable();
         }
         else {
-            scheduleUpdater->immediateGroupScheduleUpdate(*chosenGroup);
+            scheduleUpdater->immediateGroupScheduleUpdate(*chosenGroup, false);
         }
     }
     else {
@@ -241,7 +247,6 @@ void MainWindow::on_savedSchedulesButton_clicked()
     if (scheduleToUpdate != NULL) {
         auto groupToUpdate = std::find_if(groups.begin(), groups.end(),
                                           [&scheduleToUpdate](UniversityGroup group){ return group.name == scheduleToUpdate;});
-        scheduleUpdater->immediateGroupScheduleUpdate(*groupToUpdate);
-        //QMessageBox::information(this, "Update schedule information", "Schedule " + scheduleToUpdate + " was successfully updated!");
+        scheduleUpdater->immediateGroupScheduleUpdate(*groupToUpdate, true);
     }
 }

@@ -13,7 +13,7 @@ ScheduleUpdater::ScheduleUpdater(const QVector<UniversityGroup>& groups, QObject
     parser = new Parser();
     groupsToUpdate = groups;
     connect(webFileDownloader, SIGNAL(downloaded()), this, SLOT(readResponseFromScheduleServer()));
-    connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGroupSchedule()));
+    connect(updateTimer, SIGNAL(timeout()), this, SLOT(updateGroupsSchedule()));
     frequencyUpdate = std::chrono::hours(2);
     updateTimer->start(frequencyUpdate);
 }
@@ -24,12 +24,13 @@ ScheduleUpdater::~ScheduleUpdater() {
     delete parser;
 }
 
-void ScheduleUpdater::immediateGroupScheduleUpdate(UniversityGroup group)
+void ScheduleUpdater::immediateGroupScheduleUpdate(UniversityGroup group, bool isFromDialog)
 {
     QString groupSchedulelink = ScheduleURLGenerator::generateGroupScheduleURL(
                 group.unitCode, group.sequenceNumber);
 
     webFileDownloader->sendGetHttpRequest(groupSchedulelink);
+    isImmediateUpdateFromDialog = isFromDialog;
 }
 
 Schedule ScheduleUpdater::getUpdatedSchedule()
@@ -45,6 +46,7 @@ void ScheduleUpdater::updateGroupsSchedule()
 
         webFileDownloader->sendGetHttpRequest(groupSchedulelink);
     }
+    isImmediateUpdateFromDialog = false;
 }
 
 void ScheduleUpdater::readResponseFromScheduleServer()
@@ -53,5 +55,5 @@ void ScheduleUpdater::readResponseFromScheduleServer()
     QTextCodec *codec = QTextCodec::codecForName("UTF-8");
     QString fileContent = codec->toUnicode(response);
     updatedSchedule = parser->parseSchedule(fileContent);
-    emit updated();
+    emit updated(isImmediateUpdateFromDialog);
 }

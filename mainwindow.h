@@ -8,6 +8,7 @@
 #include "schedule.h"
 #include "universitygroup.h"
 
+#include <QByteArray>
 #include <QDate>
 #include <QMainWindow>
 #include <QStringList>
@@ -27,13 +28,13 @@ public:
 
 private slots:
     void loadAllGroups();
-    void getUpdatedSchedule();
+    void getUpdatedSchedule(bool);
     void on_getScheduleButton_clicked();
 
 
-    void on_startDateCalendarWidget_clicked(const QDate &date);
+    void on_startDateCalendarWidget_clicked(const QDate&);
 
-    void on_endDateCalendarWidget_clicked(const QDate &date);
+    void on_endDateCalendarWidget_clicked(const QDate&);
 
     void on_savedSchedulesButton_clicked();
 
@@ -60,6 +61,6 @@ private:
     int showDownloadedScheduleDialogToUser();
     QVector<UniversityClass> filterSchedule();
     Schedule getSchedule(UniversityGroup *group);
-
+    void saveUpdatedSchedule();
 };
 #endif // MAINWINDOW_H

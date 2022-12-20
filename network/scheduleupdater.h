@@ -18,10 +18,10 @@ class ScheduleUpdater : public QObject
 public:
     explicit ScheduleUpdater(const QVector<UniversityGroup>&, QObject *parent = nullptr);
     virtual ~ScheduleUpdater();
-    void immediateGroupScheduleUpdate(UniversityGroup);
+    void immediateGroupScheduleUpdate(UniversityGroup, bool);
     Schedule getUpdatedSchedule();
 signals:
-    void updated();
+    void updated(bool);
 
 public slots:
     void updateGroupsSchedule();
@@ -35,8 +35,10 @@ private:
     WebFileDownloader* webFileDownloader;
     Parser* parser;
     QVector<UniversityGroup> groupsToUpdate;
-    Schedule updatedSchedule;
     std::chrono::hours frequencyUpdate;
+
+    Schedule updatedSchedule;
+    bool isImmediateUpdateFromDialog = false;
 };
 
 #endif // SCHEDULEUPDATER_H
